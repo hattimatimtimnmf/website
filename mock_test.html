@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="GitLab Pages">
+    <title>Hattimatimtim - Mock Test & Exam Prep</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="index.html" class="nav-item">Hattimatimtim 🏡</a>
+        </div>
+        <div class="nav-left" id="nav-links">
+            <a href="lessons.html" class="nav-item">Lessons</a>
+            <a href="#games" class="nav-item">Play Zone</a>
+            <a href="#stories" class="nav-item">Story Time</a>
+            <a href="#about" class="nav-item">About Us</a>
+        </div>
+        <div class="nav-right">
+            <a href="#account" class="nav-item account-btn">My Account</a>
+        </div>
+        <button class="menu-toggle" aria-label="Toggle Navigation">☰</button>
+    </nav>
+
+    <section class="hero-placeholder" id="mock-test-header">
+        <div class="hero-content">
+            <h2>Exam Practice Center! ✏️</h2>
+            <p>Ready to test your knowledge? Select an exam below to access practice papers, mock tests, and assessment tools.</p>
+        </div>
+    </section>
+
+    <section class="lesson-grid-section">
+
+        <button class="action-card mock-test-school" 
+            data-hover="Practice exams for the Madhyamik final board examination." 
+            onclick="window.location.href='test_madhyamik.html'">
+            <span class="card-icon">🏫</span>
+            <span class="card-title">Madhyamik (মাধ্যমিক)</span>
+        </button>
+
+        <button class="action-card mock-test-school" 
+            data-hover="Semester 1 practice tests for Class 11 students." 
+            onclick="window.location.href='tests_class11_sem1.html'">
+            <span class="card-icon">📝</span>
+            <span class="card-title">Class 11 Sem 1</span>
+        </button>
+        
+        <button class="action-card mock-test-school" 
+            data-hover="Semester 2 practice tests for Class 11 students." 
+            onclick="window.location.href='tests_class11_sem2.html'">
+            <span class="card-icon">🗓️</span>
+            <span class="card-title">Class 11 Sem 2</span>
+        </button>
+        
+        <button class="action-card mock-test-school" 
+            data-hover="Practice tests for Class 12 final board examination." 
+            onclick="window.location.href='tests_class12_final.html'">
+            <span class="card-icon">🎓</span>
+            <span class="card-title">Class 12 Final</span>
+        </button>
+
+        <button class="action-card mock-test-entrance" 
+            data-hover="National Eligibility cum Entrance Test (Undergraduate) practice papers." 
+            onclick="window.location.href='tests_neet_ug.html'">
+            <span class="card-icon">🩺</span>
+            <span class="card-title">NEET UG</span>
+        </button>
+
+        <button class="action-card mock-test-entrance" 
+            data-hover="Joint Entrance Examination Main practice tests for Engineering admissions." 
+            onclick="window.location.href='tests_jee_main.html'">
+            <span class="card-icon">⚙️</span>
+            <span class="card-title">JEE Main</span>
+        </button>
+        
+        <button class="action-card mock-test-nursing" 
+            data-hover="Auxiliary Nurse Midwifery (ANM) entrance exam practice." 
+            onclick="window.location.href='tests_anm.html'">
+            <span class="card-icon">🩹</span>
+            <span class="card-title">ANM Entrance</span>
+        </button>
+
+        <button class="action-card mock-test-nursing" 
+            data-hover="General Nursing and Midwifery (GNM) entrance exam practice." 
+            onclick="window.location.href='tests_gnm.html'">
+            <span class="card-icon">💉</span>
+            <span class="card-title">GNM Entrance</span>
+        </button>
+
+    </section>
+
+    <footer class="main-footer">
+        <div class="footer-links">
+            <a href="index.html#about">About Us</a> |
+            <a href="index.html#contribute">Contribute</a> |
+            <a href="index.html#feedback">Feedback</a> |
+            <a href="index.html#privacy">Privacy</a>
+        </div>
+        <p>© 2025 Hattimatimtim. All Rights Reserved. Made with fun and imagination!</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinks = document.getElementById('nav-links');
+            const navRight = document.querySelector('.nav-right');
+
+            if (menuToggle && navLinks && navRight) {
+                menuToggle.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                    navRight.classList.toggle('active');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
