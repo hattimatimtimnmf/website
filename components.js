@@ -29,7 +29,7 @@ const headerHTML = `
         </div>
         <div class="nav-left" id="nav-links">
             <a href="${getPath('lessons.html')}" class="nav-item">Lessons</a>
-            <a href="${getPath('mock_test.html')}" class="nav-item">Mock Test</a>
+            <a href="${getPath('test/mock_test.html')}" class="nav-item">Mock Test</a>
             <a href="${getPath('#games')}" class="nav-item">Play Zone</a>
             <a href="${getPath('#stories')}" class="nav-item">Story Time</a>
             <a href="${getPath('#about')}" class="nav-item">About Us</a>
