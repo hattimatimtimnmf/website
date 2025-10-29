@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="GitLab Pages">
+    <title>Hattimatimtim - Physical Science Mock Tests</title>
+    <link rel="stylesheet" href="../style.css">
+    
+    <style>
+        /* BASE STYLES for Content Alignment */
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 var(--content-padding, 15px);
+        }
+        
+        /* Dashboard-specific colors/styles */
+        .status-attempted { color: #4CAF50; font-weight: bold; } /* Green */
+        .status-not-attempted { color: #F44336; font-weight: bold; } /* Red */
+        .marks-success { color: #007bff; font-weight: bold; } /* Blue */
+        
+        /* Button styling for actions (will use general .nav-item styling in style.css, but customized here) */
+        .action-button-small {
+            background-color: #FF9800; /* Orange */
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: background-color 0.2s;
+        }
+        .action-button-small:hover {
+            background-color: #E65100;
+        }
+
+        /* Responsive table wrapper (critical for mobile view) */
+        .table-responsive-test {
+            overflow-x: auto;
+            margin: 20px 0;
+            -webkit-overflow-scrolling: touch;
+        }
+        .test-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 550px; /* Forces scroll on small phones */
+        }
+        .test-table th, .test-table td {
+            padding: 12px 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        .test-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .test-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="index.html" class="nav-item">Hattimatimtim 🏡</a>
+        </div>
+        <div class="nav-left" id="nav-links">
+            <a href="lessons.html" class="nav-item">Lessons</a>
+            <a href="mock_test.html" class="nav-item">Mock Test</a>
+            <a href="#stories" class="nav-item">Story Time</a>
+            <a href="#about" class="nav-item">About Us</a>
+        </div>
+        <div class="nav-right">
+            <a href="#account" class="nav-item account-btn">My Account</a>
+        </div>
+        <button class="menu-toggle" aria-label="Toggle Navigation">☰</button>
+    </nav>
+
+    <section class="hero-placeholder" id="test-header">
+        <div class="hero-content">
+            <h2>Physical Science Mock Tests (Madhyamik) ⚛️</h2>
+            <p>Track your progress across 8 essential mock tests. Aim for 100% completion before the final exam!</p>
+        </div>
+    </section>
+
+    <main>
+        <div class="table-responsive-test">
+            <table class="test-table">
+                <thead>
+                    <tr>
+                        <th>Test ID</th>
+                        <th>Status</th>
+                        <th>Marks (Out of 90)</th>
+                        <th>Date Completed</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Test 1: Mechanics Basics</td>
+                        <td class="status-attempted">Attempted</td>
+                        <td><span class="marks-success">78</span></td>
+                        <td>2025-10-25</td>
+                        <td><a href="#test1_reattempt" class="action-button-small">Re-attempt</a></td>
+                    </tr>
+                    <tr>
+                        <td>Test 2: Waves and Sound</td>
+                        <td class="status-not-attempted">Not Attempted</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td><a href="test2.html" class="action-button-small">Attempt</a></td>
+                    </tr>
+                    <tr>
+                        <td>Test 3: Chemical Reactions</td>
+                        <td class="status-attempted">Attempted</td>
+                        <td><span class="marks-success">65</span></td>
+                        <td>2025-11-01</td>
+                        <td><a href="#test3_reattempt" class="action-button-small">Re-attempt</a></td>
+                    </tr>
+                    <tr>
+                        <td>Test 4: Electricity and Circuits</td>
+                        <td class="status-not-attempted">Not Attempted</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td><a href="#test4_attempt" class="action-button-small">Attempt</a></td>
+                    </tr>
+                    <tr>
+                        <td>Test 5: Heat and Thermodynamics</td>
+                        <td class="status-attempted">Attempted</td>
+                        <td><span class="marks-success">42</span></td>
+                        <td>2025-11-10</td>
+                        <td><a href="#test5_reattempt" class="action-button-small">Re-attempt</a></td>
+                    </tr>
+                    <tr>
+                        <td>Test 6: Periodic Table</td>
+                        <td class="status-not-attempted">Not Attempted</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td><a href="#test6_attempt" class="action-button-small">Attempt</a></td>
+                    </tr>
+                    <tr>
+                        <td>Test 7: Acids, Bases, Salts</td>
+                        <td class="status-not-attempted">Not Attempted</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td><a href="#test7_attempt" class="action-button-small">Attempt</a></td>
+                    </tr>
+                    <tr>
+                        <td>Test 8: Final Review Test</td>
+                        <td class="status-not-attempted">Not Attempted</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td><a href="#test8_attempt" class="action-button-small">Attempt</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="activity">
+            <h3>Need help with a topic?</h3>
+            <p>If you scored low on a test, click the **Lessons** button in the navigation bar to revisit the core concepts before attempting the test again!</p>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-links">
+            <a href="index.html#about">About Us</a> |
+            <a href="index.html#contribute">Contribute</a> |
+            <a href="index.html#feedback">Feedback</a> |
+            <a href="index.html#privacy">Privacy</a>
+        </div>
+        <p>© 2025 Hattimatimtim. All Rights Reserved. Made with fun and imagination!</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinks = document.getElementById('nav-links');
+            const navRight = document.querySelector('.nav-right');
+
+            if (menuToggle && navLinks && navRight) {
+                menuToggle.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                    navRight.classList.toggle('active');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
