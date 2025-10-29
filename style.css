@@ -1,0 +1,534 @@
+/* ==================================== */
+/* 1. Global & Utility Styles           */
+/* ==================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    /* Kid-friendly font, adjusted for better readability */
+    font-family: 'Comic Sans MS', cursive, 'Arial', sans-serif;
+    background-color: #f7fcf9;
+    color: #333;
+    line-height: 1.6;
+    /* Base padding for mobile safe zones. Overridden by specific pages for max-width content. */
+    padding: 10px 15px; 
+}
+
+/* Ensure main content container is centered and constrained */
+main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+/* Typography styles */
+h1 { color: #333; font-size: 1.8em; }
+h2 { color: #007bff; border-bottom: 2px solid #007bff; padding-bottom: 5px; margin-top: 25px; font-size: 1.4em; }
+h3 { color: #333; font-size: 1.1em; margin-top: 20px; }
+strong { font-weight: bold; }
+
+/* Utility for clear floats */
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+/* ==================================== */
+/* 2. Navigation Bar (Mobile First: Collapsed Menu) */
+/* ==================================== */
+.navbar {
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: space-between;
+    align-items: center;
+    background-color: #4CAF50; /* Green */
+    padding: 10px 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.nav-brand a {
+    font-size: 1.4em;
+    font-weight: 800;
+    color: #FFD700; /* Gold */
+    text-decoration: none;
+}
+
+.nav-item {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    display: block;
+    transition: background-color 0.3s;
+}
+
+.nav-item:hover {
+    background-color: #388E3C;
+}
+
+/* Default state: Hide menu items on mobile */
+.nav-left, .nav-right {
+    display: none;
+    flex-direction: column; /* Stack links vertically */
+    width: 100%; 
+}
+
+/* State when hamburger is clicked (via JS adding .active class) */
+.nav-left.active, .nav-right.active {
+    display: flex; /* Show the links stacked vertically */
+}
+
+.account-btn {
+    background-color: #FF6347;
+    border-radius: 5px;
+    margin: 5px 0;
+    text-align: center;
+}
+
+.menu-toggle {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.8em;
+    cursor: pointer;
+    display: block; /* Visible on mobile */
+}
+
+/* ==================================== */
+/* 3. Hero & Base Content Blocks        */
+/* ==================================== */
+
+.hero-placeholder {
+    background: linear-gradient(135deg, #FFC0CB, #ADD8E6); /* Pink to Blue gradient */
+    padding: 40px 20px;
+    text-align: center;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.hero-content h2 { color: #8B008B; margin-bottom: 10px; font-size: 1.8em; border-bottom: none; }
+.hero-content p { color: #4B0082; font-size: 1.1em; }
+
+.slider-placeholder {
+    min-height: 200px; /* Mobile height */
+    background-color: #ffffff;
+    border: 3px dashed #FF6347;
+    border-radius: 10px;
+    margin-top: 25px;
+    line-height: 200px;
+    color: #555;
+    font-style: italic;
+}
+
+/* Lesson/Activity Specific Blocks */
+.info-box { background-color: #e6f7ff; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+.activity {
+    background-color: #fff;
+    padding: 15px;
+    border: 1px dashed #ff9900;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: auto; 
+}
+
+/* ==================================== */
+/* 4. Action Button/Card Grids (index & lessons pages) */
+/* ==================================== */
+.button-grid-section, .lesson-grid-section {
+    display: flex;
+    flex-direction: column; /* Default: Stack buttons vertically */
+    gap: 15px;
+    padding: 20px;
+    max-width: 95%;
+    margin: 20px auto;
+}
+
+.action-card {
+    background-color: #FF6347;
+    color: white;
+    border: 5px solid white;
+    border-radius: 15px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+    width: 100%; /* Full width on mobile */
+    max-width: 400px; /* Constrain max width for readability */
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card-icon {
+    font-size: 3em;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.card-title {
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+/* Card Specific Colors (For lessons.html and index.html) */
+.explore-button, .math-category { background-color: #00BFFF; }
+.translate-button, .english-category { background-color: #3CB371; }
+.games-button { background-color: #FFD700; color: #333; }
+.lucky-button { background-color: #9370DB; }
+.mock-test-button { background-color: #FFA500; } /* Orange */
+.science-category, .math-science-category { background-color: #FF9800; }
+.history-category { background-color: #795548; }
+.psychology-category { background-color: #9C27B0; }
+.pedagogy-category { background-color: #4CAF50; }
+.misc-category, .combo-category-1, .combo-category-2, .combo-category-3 { background-color: #FFEB3B; color: #333; }
+
+
+/* ==================================== */
+/* 5. Lesson Page Content Layouts (Activity Fixes) */
+/* ==================================== */
+
+/* Inline Figure/Image (for decimal_lesson.html) */
+.inline-figure {
+    display: block;
+    width: 100%;
+    margin: 15px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px;
+    background-color: #fff;
+}
+.inline-figure img { width: 100%; height: auto; display: block; border-radius: 3px; }
+.inline-figure p { text-decoration: none; color: #007bff; font-size: 0.8em; text-align: center; margin: 5px 0 0; }
+
+/* Math and Table Layouts */
+.math-exercise-grid, .math-equivalents-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 15px 10px;
+    margin-top: 15px;
+}
+.math-exercise-grid .math-item {
+    width: 90%; 
+    font-size: 1.1em;
+    padding: 5px 0;
+    text-align: left;
+}
+.math-equivalents-grid .math-item {
+    width: 45%; 
+    font-size: 1.1em;
+    padding: 5px 0;
+    text-align: center;
+}
+
+/* Shopping List Grid (Activity 2) */
+.shopping-list-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-left: 15px;
+    list-style: none;
+}
+.shopping-list-grid .list-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    width: 100%; 
+    border-bottom: 1px dashed #eee;
+}
+
+/* Pre-formatted math wrapper for horizontal scrolling on mobile (Activity 4) */
+.pre-responsive {
+    overflow-x: auto;
+    margin: 15px 0;
+    -webkit-overflow-scrolling: touch; 
+}
+.math-pre {
+    min-width: 500px; /* Ensure wide enough to trigger scroll */
+    font-size: 1.1em;
+    padding: 10px;
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Table Responsive Wrapper */
+/* --- Table and Pre Layout Fixes --- */
+.table-responsive {
+    overflow-x: auto; /* Enables horizontal scrolling on small screens */
+    margin: 15px 0;
+    -webkit-overflow-scrolling: touch; /* Smoother scrolling on iOS */
+}
+table { 
+    border-collapse: collapse; 
+    width: 100%; 
+    min-width: 300px; /* Ensures table is wide enough to scroll if needed */
+    border: 2px solid #33cc33; 
+    font-size: 0.9em; 
+}
+th, td { border: 1px solid #c2f0c2; padding: 8px; text-align: center; }
+
+
+/* ==================================== */
+/* 6. Footer Styles                     */
+/* ==================================== */
+.main-footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #333;
+    color: #ccc;
+    font-size: 0.9em;
+    margin-top: 30px;
+}
+
+.footer-links a {
+    color: #ccc;
+    text-decoration: none;
+    margin: 0 8px;
+}
+
+/* ==================================== */
+/* 7. Media Queries (Tablet & Desktop - Horizontal Layout) */
+/* ==================================== */
+@media (min-width: 768px) {
+    /* --- General Layout --- */
+    body { padding: 20px; }
+    .hero-content h2 { font-size: 2.2em; }
+    
+    /* Navigation - Horizontal flow */
+    .navbar { padding: 10px 30px; }
+    .nav-left, .nav-right {
+        display: flex !important;
+        flex-direction: row; 
+        width: auto;
+        margin-top: 0;
+    }
+    .nav-left { margin-left: 20px; }
+    .nav-right .nav-item { border-bottom: none; }
+    .nav-item { padding: 10px 15px; }
+    .menu-toggle { display: none; }
+
+    /* Slider/Hero */
+    .slider-placeholder { min-height: 350px; line-height: 350px; }
+
+
+    /* --- Button & Card Grids (index.html, lessons.html) --- */
+    /* ==================================== */
+/* 4. Action Button/Card Grids (Mobile Default: Vertical Stack) */
+/* ==================================== */
+.button-grid-section, .lesson-grid-section {
+    display: flex;
+    flex-direction: column; /* Default: Stack buttons vertically */
+    gap: 15px;
+    padding: 20px;
+    max-width: 95%;
+    margin: 20px auto;
+}
+
+.action-card {
+    /* ... (rest of the card styling - ensures 100% width on mobile) ... */
+    width: 100%; 
+    max-width: 400px;
+    /* ... */
+}
+
+/* ==================================== */
+/* 7. Media Queries (Tablet & Desktop - Horizontal Grid) */
+/* ==================================== */
+@media (min-width: 768px) {
+    /* --- General Layout --- */
+    /* ... (navigation and body rules) ... */
+
+    /* --- Button & Card Grids (index.html, lessons.html) --- */
+    .button-grid-section, .lesson-grid-section {
+        flex-direction: row; /* FIX: LAYOUT SWITCHED TO HORIZONTAL */
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 90%;
+    }
+    
+    /* Styles for the buttons on the index page (2 cards per row) */
+    .button-grid-section .action-card {
+        width: 45%; 
+        max-width: 250px;
+        font-size: 1.4em;
+    }
+    
+    /* Styles for the lesson page categories (3 cards per row on Tablet) */
+    .lesson-grid-section .action-card {
+        /* FIX: Calculates width for 3 columns, subtracting the gap space */
+        width: calc(33.333% - 15px); 
+        min-width: 220px;
+        font-size: 1.2em;
+    }
+    .action-card {
+        width: 30%; /* Three cards per row on tablet */ 
+        max-width: 250px;
+    }
+}
+
+@media (min-width: 1024px) {
+    /* Large Desktop: 4 cards per row for lessons */
+    .lesson-grid-section .action-card {
+        width: calc(25% - 15px); 
+        min-width: 200px;
+        font-size: 1.3em;
+    }
+}
+    .action-card {
+        /* Calculates width for 5 columns, subtracting the gap space (approx. 18-19%) */
+        width: calc(20% - 15px); 
+        max-width: 250px;
+        font-size: 1.4em;
+    }
+    .lesson-grid-section .action-card {
+        width: calc(25% - 15px); /* Three cards per row for lessons */
+        min-width: 220px;
+        font-size: 1.2em;
+    }
+
+    /* --- Lesson Page Fixes (decimal_lesson.html) --- */
+    
+    /* Image to float right, allowing text wrap */
+    .inline-figure {
+        float: right; 
+        width: 30%; 
+        margin: 0 0 15px 20px; 
+    }
+    
+    /* Two-column layout for shopping list */
+   /* --- 5. Lesson Page Content Layouts (Activity Fixes) --- */
+/* ... (Keep existing CSS for other classes above this section) ... */
+
+/* --- Shopping List Grid (Activity 2) --- */
+.shopping-list-grid {
+    /* Use Grid for precise column alignment */
+    display: grid;
+    /* Define two columns: Auto-size for item name, and a fixed/min-width for price */
+    grid-template-columns: auto minmax(80px, 120px); 
+    gap: 0 10px; /* No row gap, 10px column gap */
+    padding: 10px 15px; 
+    list-style: none;
+    border: 1px solid #ddd; /* Optional: adds a neat border around the list */
+    border-radius: 5px;
+    margin: 15px 0;
+}
+
+.shopping-list-grid .list-item {
+    /* Resetting flex properties, as we are using CSS Grid on the parent */
+    display: contents; /* Allows children to participate directly in the grid layout */
+    padding: 0;
+    width: auto; 
+    border-bottom: none;
+}
+
+.shopping-list-grid .list-item span {
+    font-weight: normal;
+    color: #444;
+    padding: 5px 0;
+}
+
+.shopping-list-grid .list-item span:first-child {
+    font-weight: bold;
+    /* This span takes the first (auto) column */
+    text-align: left; 
+    border-bottom: 1px dashed #eee;
+}
+
+.shopping-list-grid .list-item span:last-child {
+    /* This span takes the second (fixed width) column */
+    text-align: right; 
+    color: #FF6347; /* Make the price stand out */
+    font-weight: bold;
+    border-bottom: 1px dashed #eee;
+}
+
+/* --- Media Query Overrides (Desktop/Tablet) --- */
+
+@media (min-width: 600px) {
+    /* ... (Keep existing CSS for other classes above this section) ... */
+
+    /* Shopping list on Desktop: Make it a single, clean block */
+    .shopping-list-grid {
+        grid-template-columns: 1fr max-content; /* Max-content for the prices */
+        max-width: 450px; /* Constrain width for a receipt look */
+        margin-left: 0;
+        margin-right: auto;
+    }
+}
+
+    /* Four-column layout for math examples */
+    .math-equivalents-grid .math-item {
+        width: 23%; 
+        font-size: 1.2em;
+    }
+    .math-exercise-grid .math-item {
+        width: 45%; 
+    }
+}
+
+@media (min-width: 1024px) {
+    /* Large Desktop Tweaks */
+    .action-card {
+        width: 23%; /* Four cards per row on large desktop */
+    }
+    .lesson-grid-section .action-card {
+        width: calc(25% - 15px); 
+        font-size: 1.3em;
+    }
+    .math-exercise-grid .math-item {
+        width: 23%; 
+    }
+}
+
+/* --- New Section: Mock Test Colors (Add these to your style.css) --- */
+
+/* School/Board Exams (E.g., Madhyamik, Class 11/12) */
+.mock-test-school { 
+    background-color: #388E3C; /* Darker Green */
+}
+
+/* National Entrance Exams (JEE/NEET) */
+.mock-test-entrance { 
+    background-color: #FF5722; /* Deep Orange/Red */
+}
+
+/* Nursing Entrance Exams (ANM/GNM) */
+.mock-test-nursing { 
+    background-color: #00BCD4; /* Cyan/Teal */
+}
+
+/* --- New Section: Madhyamik Subject Colors --- */
+
+/* Language Subjects */
+.madhyamik-lang { 
+    background-color: #00BCD4; /* Cyan */
+}
+
+/* Core Science Subjects */
+.madhyamik-science { 
+    background-color: #4CAF50; /* Green */
+}
+
+/* Mathematics */
+.madhyamik-maths { 
+    background-color: #2196F3; /* Blue */
+}
+
+/* Humanities / History & Geography */
+.madhyamik-history, .madhyamik-geo { 
+    background-color: #FF9800; /* Orange */
+}
+
+/* Optional Subjects */
+.madhyamik-optional {
+    background-color: #9C27B0; /* Purple */
+}

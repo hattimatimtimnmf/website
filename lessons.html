@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="GitLab Pages">
+    <title>Hattimatimtim - Explore Lessons</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="index.html" class="nav-item">Hattimatimtim 🏡</a>
+        </div>
+        <div class="nav-left" id="nav-links">
+            <a href="#lessons" class="nav-item">Lessons</a>
+            <a href="#games" class="nav-item">Play Zone</a>
+            <a href="#stories" class="nav-item">Story Time</a>
+            <a href="#about" class="nav-item">About Us</a>
+        </div>
+        <div class="nav-right">
+            <a href="#account" class="nav-item account-btn">My Account</a>
+        </div>
+        <button class="menu-toggle" aria-label="Toggle Navigation">☰</button>
+    </nav>
+
+    <section class="hero-placeholder" id="top-header">
+        <div class="hero-content">
+            <h2>Explore Our Magical Library! 📚</h2>
+            <p>Ready to start learning? Choose a subject below to find activities, stories, and challenges.</p>
+        </div>
+    </section>
+
+    <section class="lesson-grid-section">
+
+        <button class="action-card math-category" 
+            data-hover="Explore the world of numbers, shapes, and counting." 
+            onclick="window.location.href='math.html'">
+            <span class="card-icon">➕</span>
+            <span class="card-title">Maths</span>
+        </button>
+        
+
+        <button class="action-card science-category" 
+            data-hover="Explore how the world works with experiments and fun facts." 
+            onclick="window.location.href='science_lessons.html'">
+            <span class="card-icon">🧪</span>
+            <span class="card-title">Science</span>
+        </button>
+        <button class="action-card history-category" 
+            data-hover="Travel through time and learn about the past and our society." 
+            onclick="window.location.href='history_lessons.html'">
+            <span class="card-icon">🏰</span>
+            <span class="card-title">History / Social Sciences</span>
+        </button>
+
+        <button class="action-card english-category" 
+            data-hover="Dive into reading, writing, and language fun." 
+            onclick="window.location.href='english_lessons.html'">
+            <span class="card-icon">📖</span>
+            <span class="card-title">English</span>
+        </button>
+        <button class="action-card psychology-category" 
+            data-hover="Learn about feelings, friends, and how we think." 
+            onclick="window.location.href='psychology_lessons.html'">
+            <span class="card-icon">🧠</span>
+            <span class="card-title">Psychology & Well-being</span>
+        </button>
+
+      
+
+        <button class="action-card pedagogy-category" 
+            data-hover="Tips and ideas for teaching and learning." 
+            onclick="window.location.href='pedagogy_lessons.html'">
+            <span class="card-icon">👩‍🏫</span>
+            <span class="card-title">Pedagogy</span>
+        </button>
+        
+        
+
+        <button class="action-card misc-category" 
+            data-hover="Find various fun and uncategorized topics." 
+            onclick="window.location.href='misc_lessons.html'">
+            <span class="card-icon">💡</span>
+            <span class="card-title">Miscellaneous Topics</span>
+        </button>
+
+    </section>
+
+    <footer class="main-footer">
+        <div class="footer-links">
+            <a href="index.html#about">About Us</a> |
+            <a href="index.html#contribute">Contribute</a> |
+            <a href="index.html#feedback">Feedback</a> |
+            <a href="index.html#privacy">Privacy</a>
+        </div>
+        <p>© 2025 Hattimatimtim. All Rights Reserved. Made with fun and imagination!</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinks = document.getElementById('nav-links');
+            const navRight = document.querySelector('.nav-right');
+
+            if (menuToggle && navLinks && navRight) {
+                menuToggle.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                    navRight.classList.toggle('active');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
