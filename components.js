@@ -7,11 +7,11 @@ const headerHTML = `
             <a href="website/index.html" class="nav-item">Hattimatimtim 🏡</a>
         </div>
         <div class="nav-left" id="nav-links">
-            <a href="website//lessons.html" class="nav-item">Lessons</a>
-            <a href="website//mock_test.html" class="nav-item">Mock Test</a>
-            <a href="website//#games" class="nav-item">Play Zone</a>
-            <a href="website//#stories" class="nav-item">Story Time</a>
-            <a href="website//#about" class="nav-item">About Us</a>
+            <a href="website/lessons.html" class="nav-item">Lessons</a>
+            <a href="website/mock_test.html" class="nav-item">Mock Test</a>
+            <a href="website/#games" class="nav-item">Play Zone</a>
+            <a href="website/#stories" class="nav-item">Story Time</a>
+            <a href="website/#about" class="nav-item">About Us</a>
         </div>
         <div class="nav-right">
             <a href="/#account" class="nav-item account-btn">My Account</a>
@@ -24,10 +24,10 @@ const headerHTML = `
 const footerHTML = `
     <footer class="main-footer">
         <div class="footer-links">
-            <a href="website//index.html#about">About Us</a> |
-            <a href="website//index.html#contribute">Contribute</a> |
-            <a href="website//index.html#feedback">Feedback</a> |
-            <a href="website//index.html#privacy">Privacy</a>
+            <a href="website/index.html#about">About Us</a> |
+            <a href="website/index.html#contribute">Contribute</a> |
+            <a href="website/index.html#feedback">Feedback</a> |
+            <a href="website/index.html#privacy">Privacy</a>
         </div>
         <p>© 2025 Hattimatimtim. All Rights Reserved. Made with fun and imagination!</p>
     </footer>
