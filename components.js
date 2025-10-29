@@ -2,20 +2,23 @@
 
 // Function to generate the correct path based on the current page location
 function getPath(filename) {
-    // Check if the current page URL path includes the '/test/' subdirectory
+    // Determine the base path needed to reach the /website/ folder.
+    const pathSegments = window.location.pathname.split('/').filter(segment => segment.length > 0);
+    
+    // If the path contains 'website' AND a second directory (e.g., 'website/test/'), we are in a subdirectory.
+    // However, if the user is testing locally, pathSegments might be long and confusing (C:/...).
+    // For a clean Git/Web deployment where all main files are in 'website/', we use a simple check:
+    
+    // Check if we are currently in the 'test' directory (assuming all test pages are 1 folder deep).
     const isInsideTestFolder = window.location.pathname.includes('/test/');
 
     if (isInsideTestFolder) {
-        // If inside the /test/ folder, go up one level (../) to find the main files.
-        // We link to anchors on the home page via index.html
-        if (filename.startsWith('#')) {
-            return 'index.html' + filename;
-        }
-        // General link to parent folder files
+        // If inside /website/test/, links need to go up one level (../) to reach the main files.
         return '../' + filename;
     } else {
-        // If in the root folder, link directly to the file in the current directory.
-        return filename;
+        // If outside the /test/ folder (e.g., in /website/ or /), links are direct.
+        // We will prepend 'website/' to ensure paths link correctly from the root index.html
+        return 'website/' + filename; 
     }
 }
 
@@ -28,14 +31,13 @@ const headerHTML = `
         <div class="nav-left" id="nav-links">
             <a href="${getPath('lessons.html')}" class="nav-item">Lessons</a>
             <a href="${getPath('mock_test.html')}" class="nav-item">Mock Test</a>
-            <a href="${getPath('#games')}" class="nav-item">Play Zone</a>
-            <a href="${getPath('#stories')}" class="nav-item">Story Time</a>
-            <a href="${getPath('#about')}" class="nav-item">About Us</a>
+            <a href="${getPath('index.html')}#games" class="nav-item">Play Zone</a>
+            <a href="${getPath('index.html')}#stories" class="nav-item">Story Time</a>
+            <a href="${getPath('index.html')}#about" class="nav-item">About Us</a>
         </div>
         <div class="nav-right">
-            <a href="${getPath('#account')}" class="nav-item account-btn">My Account</a>
+            <a href="${getPath('index.html')}#account" class="nav-item account-btn">My Account</a>
         </div>
-        <!-- Hamburger menu icon for mobile -->
         <button class="menu-toggle" aria-label="Toggle Navigation">☰</button>
     </nav>
 `;
@@ -44,16 +46,16 @@ const headerHTML = `
 const footerHTML = `
     <footer class="main-footer">
         <div class="footer-links">
-            <a href="${getPath('index.html#about')}">About Us</a> |
-            <a href="${getPath('index.html#contribute')}">Contribute</a> |
-            <a href="${getPath('index.html#feedback')}">Feedback</a> |
-            <a href="${getPath('index.html#privacy')}">Privacy</a>
+            <a href="${getPath('index.html')}#about">About Us</a> |
+            <a href="${getPath('index.html')}#contribute">Contribute</a> |
+            <a href="${getPath('index.html')}#feedback">Feedback</a> |
+            <a href="${getPath('index.html')}#privacy">Privacy</a>
         </div>
         <p>© 2025 Hattimatimtim. All Rights Reserved. Made with fun and imagination!</p>
     </footer>
 `;
 
-// --- INJECTION FUNCTION (rest remains the same) ---
+// --- INJECTION FUNCTION ---
 
 function loadGlobalComponents() {
     // Inject Header
