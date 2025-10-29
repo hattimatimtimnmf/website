@@ -1,81 +1,79 @@
-// --- REUSABLE HTML COMPONENTS ---
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="GitLab Pages">
+    <title>Hattimatimtim - The Joy of Learning</title>
+    <link rel="stylesheet" href="style.css">
+    </head>
 
-// Define the base path for all files, which must include the repository name (website)
-// If you ever move the repo content to the root of the GitHub Pages site, you would remove "/website"
-const BASE_PATH = "/website"; 
-
-// Function to construct the absolute path
-function getAbsolutePath(filename) {
-    // This handles both files (e.g., index.html) and anchors (e.g., #about)
-    if (filename.startsWith("#")) {
-        // If it's an anchor, we link to the base index file plus the anchor
-        return BASE_PATH + "/index.html" + filename;
-    }
-    return BASE_PATH + "/" + filename;
-}
-
-// 1. Navigation Bar HTML (Header) - Uses getAbsolutePath()
-const headerHTML = `
-    <nav class="navbar">
-        <div class="nav-brand">
-            <a href="${getAbsolutePath('index.html')}" class="nav-item">Hattimatimtim 🏡</a>
+<body>
+    <div id="header-placeholder"></div>
+    <section class="hero-placeholder" id="home">
+        <div class="hero-content">
+            <h2>Welcome to a Fun Adventure!</h2>
+            <p>Step into our magical world to learn, play, and discover new stories.</p>
         </div>
-        <div class="nav-left" id="nav-links">
-            <a href="${getAbsolutePath('lessons.html')}" class="nav-item">Lessons</a>
-            <a href="${getAbsolutePath('mock_test.html')}" class="nav-item">Mock Test</a>
-            <a href="${getAbsolutePath('#games')}" class="nav-item">Play Zone</a>
-            <a href="${getAbsolutePath('#stories')}" class="nav-item">Story Time</a>
-            <a href="${getAbsolutePath('#about')}" class="nav-item">About Us</a>
+        <div class="slider-placeholder">
+            [Image Slider/Carousel Placeholder]
         </div>
-        <div class="nav-right">
-            <a href="${getAbsolutePath('#account')}" class="nav-item account-btn">My Account</a>
-        </div>
-        <button class="menu-toggle" aria-label="Toggle Navigation">☰</button>
-    </nav>
-`;
+    </section>
 
-// 2. Footer HTML - Uses getAbsolutePath()
-const footerHTML = `
-    <footer class="main-footer">
-        <div class="footer-links">
-            <a href="${getAbsolutePath('index.html#about')}">About Us</a> |
-            <a href="${getAbsolutePath('index.html#contribute')}">Contribute</a> |
-            <a href="${getAbsolutePath('index.html#feedback')}">Feedback</a> |
-            <a href="${getAbsolutePath('index.html#privacy')}">Privacy</a>
-        </div>
-        <p>© 2025 Hattimatimtim. All Rights Reserved. Made with fun and imagination!</p>
-    </footer>
-`;
+    <section class="button-grid-section">
 
-// --- INJECTION FUNCTION (rest remains the same) ---
+        <button class="action-card explore-button" 
+            data-hover="Explore our entire collection of educational resources." 
+            onclick="window.location.href='lessons.html'">
+            <span class="card-icon">📚</span>
+            <span class="card-title">Explore Lessons</span>
+        </button>
 
-function loadGlobalComponents() {
-    // Inject Header
-    const headerPlaceholder = document.getElementById('header-placeholder');
-    if (headerPlaceholder) {
-        headerPlaceholder.innerHTML = headerHTML;
-    }
+        <button class="action-card mock-test-button" 
+            data-hover="Test your knowledge with practice exams and track your progress." 
+            onclick="window.location.href='test/mock_test.html'">
+            <span class="card-icon">✏️</span>
+            <span class="card-title">Mock Test</span>
+        </button>
+        <button class="action-card games-button" 
+            data-hover="Jump into fun games designed for learning!" 
+            onclick="window.location.href='#games'">
+            <span class="card-icon">🕹️</span>
+            <span class="card-title">Play Games</span>
+        </button>
+        
+        <button class="action-card translate-button" 
+            data-hover="Help us translate content for others to enjoy." 
+            onclick="window.location.href='#contribute'">
+            <span class="card-icon">💬</span>
+            <span class="card-title">Translate & Help</span>
+        </button>
+        
+        <button class="action-card lucky-button" 
+            data-hover="Find a random fun activity or lesson!" 
+            onclick="window.location.href='#lucky'">
+            <span class="card-icon">🍀</span>
+            <span class="card-title">Feeling Lucky!</span>
+        </button>
 
-    // Inject Footer
-    const footerPlaceholder = document.getElementById('footer-placeholder');
-    if (footerPlaceholder) {
-        footerPlaceholder.innerHTML = footerHTML;
-    }
+    </section>
 
-    // --- Add Mobile Menu Toggle Logic (Needed on all pages) ---
-    document.addEventListener('DOMContentLoaded', () => {
-        const menuToggle = document.querySelector('.menu-toggle');
-        const navLinks = document.getElementById('nav-links');
-        const navRight = document.querySelector('.nav-right');
+  <div id="footer-placeholder"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinks = document.getElementById('nav-links');
+            const navRight = document.querySelector('.nav-right');
 
-        if (menuToggle && navLinks && navRight) {
-            menuToggle.addEventListener('click', function() {
-                navLinks.classList.toggle('active');
-                navRight.classList.toggle('active');
-            });
-        }
-    });
-}
-
-// Call the function immediately to load components
-loadGlobalComponents();
+            if (menuToggle && navLinks && navRight) {
+                menuToggle.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                    navRight.classList.toggle('active');
+                });
+            }
+        });
+    </script>
+  
+    <script src="components.js"></script>
+</body>
+</html>
