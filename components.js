@@ -5,17 +5,19 @@ function getPath(filename) {
     // Check if the current page URL path includes the '/test/' subdirectory
     const isInsideTestFolder = window.location.pathname.includes('/test/');
 
+    // Handle Anchor Links separately: Anchors always navigate to the index file first.
+    if (filename.startsWith("#")) {
+        const indexFile = isInsideTestFolder ? '../index.html' : 'index.html';
+        return indexFile + filename;
+    }
+
+    // Handle file links based on depth
     if (isInsideTestFolder) {
-        // If inside the /test/ folder, go up one level (../) to find the main files.
-        // We link to anchors on the home page via index.html
-        if (filename.startsWith('#')) {
-            return 'index.html' + filename;
-        }
-        // General link to parent folder files
+        // If inside the /test/ folder, go up one level (../)
         return '../' + filename;
     } else {
-        // If in the root folder, link directly to the file in the current directory.
-        return filename;
+        // If in the root folder, link directly (./ is optional but implied)
+        return './' + filename;
     }
 }
 
@@ -35,7 +37,6 @@ const headerHTML = `
         <div class="nav-right">
             <a href="${getPath('#account')}" class="nav-item account-btn">My Account</a>
         </div>
-        <!-- Hamburger menu icon for mobile -->
         <button class="menu-toggle" aria-label="Toggle Navigation">☰</button>
     </nav>
 `;
