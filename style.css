@@ -1,36 +1,38 @@
 /* ==================================== */
-/* 1. Global & Utility Styles           */
+/* 1. Global, Variables & Body          */
 /* ==================================== */
+
+/* CSS Reset and Box Sizing */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
+/* CSS Variables for consistent spacing */
+:root {
+    --content-padding: 15px; /* Padding for mobile */
+    --card-gap: 15px;        /* Gap for grids */
+}
+
+/* Base body styles */
 body {
-    /* Kid-friendly font, adjusted for better readability */
     font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
     background-color: #f7fcf9;
     color: #333;
     line-height: 1.6;
-    /* Base padding for mobile safe zones. Overridden by specific pages for max-width content. */
-    padding: 10px 15px; 
+    font-size: 1rem; /* Base font size (typically 16px) */
+    overflow-x: hidden; /* Prevents accidental horizontal scroll */
 }
 
-/* Ensure main content container is centered and constrained */
+/* Main content wrapper for centering and constraining width */
 main {
-    max-width: 900px;
+    max-width: 1080px;
     margin: 0 auto;
-    padding: 0;
+    padding: 20px var(--content-padding);
 }
 
-/* Typography styles */
-h1 { color: #333; font-size: 1.8em; }
-h2 { color: #007bff; border-bottom: 2px solid #007bff; padding-bottom: 5px; margin-top: 25px; font-size: 1.4em; }
-h3 { color: #333; font-size: 1.1em; margin-top: 20px; }
-strong { font-weight: bold; }
-
-/* Utility for clear floats */
+/* Utility for clearing floats */
 .clearfix::after {
     content: "";
     clear: both;
@@ -38,22 +40,58 @@ strong { font-weight: bold; }
 }
 
 /* ==================================== */
-/* 2. Navigation Bar (Mobile First: Collapsed Menu) */
+/* 2. Typography                        */
 /* ==================================== */
+
+h1 {
+    color: #333;
+    font-size: 2rem; /* 32px */
+    margin-bottom: 15px;
+}
+
+h2 {
+    color: #007bff;
+    font-size: 1.6rem; /* ~26px */
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 8px;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+h3 {
+    color: #333;
+    font-size: 1.25rem; /* 20px */
+    margin-top: 25px;
+    margin-bottom: 10px;
+}
+
+p, li {
+    font-size: 1rem; /* 16px */
+    margin-bottom: 15px;
+}
+
+strong {
+    font-weight: bold;
+}
+
+/* ==================================== */
+/* 3. Layout Components (Header/Footer) */
+/* ==================================== */
+
 .navbar {
     display: flex;
-    flex-wrap: wrap; 
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    background-color: #4CAF50; /* Green */
-    padding: 10px 15px;
+    background-color: #4CAF50;
+    padding: 10px var(--content-padding);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .nav-brand a {
     font-size: 1.4em;
     font-weight: 800;
-    color: #FFD700; /* Gold */
+    color: #FFD700;
     text-decoration: none;
 }
 
@@ -69,16 +107,14 @@ strong { font-weight: bold; }
     background-color: #388E3C;
 }
 
-/* Default state: Hide menu items on mobile */
 .nav-left, .nav-right {
     display: none;
-    flex-direction: column; /* Stack links vertically */
-    width: 100%; 
+    flex-direction: column;
+    width: 100%;
 }
 
-/* State when hamburger is clicked (via JS adding .active class) */
 .nav-left.active, .nav-right.active {
-    display: flex; /* Show the links stacked vertically */
+    display: flex;
 }
 
 .account-btn {
@@ -94,195 +130,12 @@ strong { font-weight: bold; }
     color: white;
     font-size: 1.8em;
     cursor: pointer;
-    display: block; /* Visible on mobile */
-}
-
-/* ==================================== */
-/* 3. Hero & Base Content Blocks        */
-/* ==================================== */
-
-.hero-placeholder {
-    background: linear-gradient(135deg, #FFC0CB, #ADD8E6); /* Pink to Blue gradient */
-    padding: 40px 20px;
-    text-align: center;
-    border-radius: 8px;
-    margin-bottom: 20px;
-}
-
-.hero-content h2 { color: #8B008B; margin-bottom: 10px; font-size: 1.8em; border-bottom: none; }
-.hero-content p { color: #4B0082; font-size: 1.1em; }
-
-.slider-placeholder {
-    min-height: 200px; /* Mobile height */
-    background-color: #ffffff;
-    border: 3px dashed #FF6347;
-    border-radius: 10px;
-    margin-top: 25px;
-    line-height: 200px;
-    color: #555;
-    font-style: italic;
-}
-
-/* Lesson/Activity Specific Blocks */
-.info-box { background-color: #e6f7ff; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
-.activity {
-    background-color: #fff;
-    padding: 15px;
-    border: 1px dashed #ff9900;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    overflow: auto; 
-}
-
-/* ==================================== */
-/* 4. Action Button/Card Grids (index & lessons pages) */
-/* ==================================== */
-.button-grid-section, .lesson-grid-section {
-    display: flex;
-    flex-direction: column; /* Default: Stack buttons vertically */
-    gap: 15px;
-    padding: 20px;
-    max-width: 95%;
-    margin: 20px auto;
-}
-
-.action-card {
-    background-color: #FF6347;
-    color: white;
-    border: 5px solid white;
-    border-radius: 15px;
-    padding: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: center;
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
-    position: relative;
-    overflow: hidden;
-    width: 100%; /* Full width on mobile */
-    max-width: 400px; /* Constrain max width for readability */
-}
-
-.action-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
-}
-
-.card-icon {
-    font-size: 3em;
     display: block;
-    margin-bottom: 5px;
 }
 
-.card-title {
-    font-size: 1.3em;
-    font-weight: bold;
-}
-
-/* Card Specific Colors (For lessons.html and index.html) */
-.explore-button, .math-category { background-color: #00BFFF; }
-.translate-button, .english-category { background-color: #3CB371; }
-.games-button { background-color: #FFD700; color: #333; }
-.lucky-button { background-color: #9370DB; }
-.mock-test-button { background-color: #FFA500; } /* Orange */
-.science-category, .math-science-category { background-color: #FF9800; }
-.history-category { background-color: #795548; }
-.psychology-category { background-color: #9C27B0; }
-.pedagogy-category { background-color: #4CAF50; }
-.misc-category, .combo-category-1, .combo-category-2, .combo-category-3 { background-color: #FFEB3B; color: #333; }
-
-
-/* ==================================== */
-/* 5. Lesson Page Content Layouts (Activity Fixes) */
-/* ==================================== */
-
-/* Inline Figure/Image (for decimal_lesson.html) */
-.inline-figure {
-    display: block;
-    width: 100%;
-    margin: 15px 0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 5px;
-    background-color: #fff;
-}
-.inline-figure img { width: 100%; height: auto; display: block; border-radius: 3px; }
-.inline-figure p { text-decoration: none; color: #007bff; font-size: 0.8em; text-align: center; margin: 5px 0 0; }
-
-/* Math and Table Layouts */
-.math-exercise-grid, .math-equivalents-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    gap: 15px 10px;
-    margin-top: 15px;
-}
-.math-exercise-grid .math-item {
-    width: 90%; 
-    font-size: 1.1em;
-    padding: 5px 0;
-    text-align: left;
-}
-.math-equivalents-grid .math-item {
-    width: 45%; 
-    font-size: 1.1em;
-    padding: 5px 0;
-    text-align: center;
-}
-
-/* Shopping List Grid (Activity 2) */
-.shopping-list-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding-left: 15px;
-    list-style: none;
-}
-.shopping-list-grid .list-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 5px 0;
-    width: 100%; 
-    border-bottom: 1px dashed #eee;
-}
-
-/* Pre-formatted math wrapper for horizontal scrolling on mobile (Activity 4) */
-.pre-responsive {
-    overflow-x: auto;
-    margin: 15px 0;
-    -webkit-overflow-scrolling: touch; 
-}
-.math-pre {
-    min-width: 500px; /* Ensure wide enough to trigger scroll */
-    font-size: 1.1em;
-    padding: 10px;
-    background-color: #f8f8f8;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-/* Table Responsive Wrapper */
-/* --- Table and Pre Layout Fixes --- */
-.table-responsive {
-    overflow-x: auto; /* Enables horizontal scrolling on small screens */
-    margin: 15px 0;
-    -webkit-overflow-scrolling: touch; /* Smoother scrolling on iOS */
-}
-table { 
-    border-collapse: collapse; 
-    width: 100%; 
-    min-width: 300px; /* Ensures table is wide enough to scroll if needed */
-    border: 2px solid #33cc33; 
-    font-size: 0.9em; 
-}
-th, td { border: 1px solid #c2f0c2; padding: 8px; text-align: center; }
-
-
-/* ==================================== */
-/* 6. Footer Styles                     */
-/* ==================================== */
 .main-footer {
     text-align: center;
-    padding: 20px;
+    padding: 20px var(--content-padding);
     background-color: #333;
     color: #ccc;
     font-size: 0.9em;
@@ -296,239 +149,311 @@ th, td { border: 1px solid #c2f0c2; padding: 8px; text-align: center; }
 }
 
 /* ==================================== */
-/* 7. Media Queries (Tablet & Desktop - Horizontal Layout) */
+/* 4. Page Sections (Hero, Grids)       */
 /* ==================================== */
-@media (min-width: 768px) {
-    /* --- General Layout --- */
-    body { padding: 20px; }
-    .hero-content h2 { font-size: 2.2em; }
-    
-    /* Navigation - Horizontal flow */
-    .navbar { padding: 10px 30px; }
-    .nav-left, .nav-right {
-        display: flex !important;
-        flex-direction: row; 
-        width: auto;
-        margin-top: 0;
-    }
-    .nav-left { margin-left: 20px; }
-    .nav-right .nav-item { border-bottom: none; }
-    .nav-item { padding: 10px 15px; }
-    .menu-toggle { display: none; }
 
-    /* Slider/Hero */
-    .slider-placeholder { min-height: 350px; line-height: 350px; }
-
-
-    /* --- Button & Card Grids (index.html, lessons.html) --- */
-    /* ==================================== */
-/* 4. Action Button/Card Grids (Mobile Default: Vertical Stack) */
-/* ==================================== */
-.button-grid-section, .lesson-grid-section {
-    display: flex;
-    flex-direction: column; /* Default: Stack buttons vertically */
-    gap: 15px;
-    padding: 20px;
-    max-width: 95%;
-    margin: 20px auto;
+.hero-placeholder {
+    background: linear-gradient(135deg, #FFC0CB, #ADD8E6);
+    padding: 40px var(--content-padding);
+    text-align: center;
+    border-radius: 8px;
+    margin-bottom: 20px;
 }
 
-.action-card {
-    /* ... (rest of the card styling - ensures 100% width on mobile) ... */
-    width: 100%; 
-    max-width: 400px;
-    /* ... */
-}
-
-/* ==================================== */
-/* 7. Media Queries (Tablet & Desktop - Horizontal Grid) */
-/* ==================================== */
-@media (min-width: 768px) {
-    /* --- General Layout --- */
-    /* ... (navigation and body rules) ... */
-
-    /* --- Button & Card Grids (index.html, lessons.html) --- */
-    .button-grid-section, .lesson-grid-section {
-        flex-direction: row; /* FIX: LAYOUT SWITCHED TO HORIZONTAL */
-        flex-wrap: wrap;
-        justify-content: center;
-        max-width: 90%;
-    }
-    
-    /* Styles for the buttons on the index page (2 cards per row) */
-    .button-grid-section .action-card {
-        width: 45%; 
-        max-width: 250px;
-        font-size: 1.4em;
-    }
-    
-    /* Styles for the lesson page categories (3 cards per row on Tablet) */
-    .lesson-grid-section .action-card {
-        /* FIX: Calculates width for 3 columns, subtracting the gap space */
-        width: calc(33.333% - 15px); 
-        min-width: 220px;
-        font-size: 1.2em;
-    }
-    .action-card {
-        width: 30%; /* Three cards per row on tablet */ 
-        max-width: 250px;
-    }
-}
-
-@media (min-width: 1024px) {
-    /* Large Desktop: 4 cards per row for lessons */
-    .lesson-grid-section .action-card {
-        width: calc(25% - 15px); 
-        min-width: 200px;
-        font-size: 1.3em;
-    }
-}
-    .action-card {
-        /* Calculates width for 5 columns, subtracting the gap space (approx. 18-19%) */
-        width: calc(20% - 15px); 
-        max-width: 250px;
-        font-size: 1.4em;
-    }
-    .lesson-grid-section .action-card {
-        width: calc(25% - 15px); /* Three cards per row for lessons */
-        min-width: 220px;
-        font-size: 1.2em;
-    }
-
-    /* --- Lesson Page Fixes (decimal_lesson.html) --- */
-    
-    /* Image to float right, allowing text wrap */
-    .inline-figure {
-        float: right; 
-        width: 30%; 
-        margin: 0 0 15px 20px; 
-    }
-    
-    /* Two-column layout for shopping list */
-   /* --- 5. Lesson Page Content Layouts (Activity Fixes) --- */
-/* ... (Keep existing CSS for other classes above this section) ... */
-
-/* --- Shopping List Grid (Activity 2) --- */
-.shopping-list-grid {
-    /* Use Grid for precise column alignment */
-    display: grid;
-    /* Define two columns: Auto-size for item name, and a fixed/min-width for price */
-    grid-template-columns: auto minmax(80px, 120px); 
-    gap: 0 10px; /* No row gap, 10px column gap */
-    padding: 10px 15px; 
-    list-style: none;
-    border: 1px solid #ddd; /* Optional: adds a neat border around the list */
-    border-radius: 5px;
-    margin: 15px 0;
-}
-
-.shopping-list-grid .list-item {
-    /* Resetting flex properties, as we are using CSS Grid on the parent */
-    display: contents; /* Allows children to participate directly in the grid layout */
-    padding: 0;
-    width: auto; 
+.hero-content h1, .hero-content h2 {
+    color: #8B008B;
     border-bottom: none;
 }
 
-.shopping-list-grid .list-item span {
-    font-weight: normal;
-    color: #444;
+.hero-content p {
+    color: #4B0082;
+    font-size: 1.1em;
+}
+
+.button-grid-section, .lesson-grid-section {
+    display: flex;
+    flex-direction: column; /* Mobile: Stack vertically */
+    gap: var(--card-gap);
+    padding-top: 20px;
+}
+
+/* ==================================== */
+/* 5. Lesson Page Content Blocks        */
+/* ==================================== */
+
+.info-box {
+    background-color: #e6f7ff;
+    padding: 25px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.activity {
+    background-color: #fff;
+    padding: 20px;
+    border: 1px dashed #ff9900;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden; /* Use hidden instead of auto to contain floats */
+}
+
+/* Standardize lists within content blocks */
+.info-box ul, .info-box ol,
+.activity ul, .activity ol {
+    padding-left: 25px;
+    margin-left: 0;
+}
+
+/* ==================================== */
+/* 6. Lesson Page Specific Elements     */
+/* ==================================== */
+
+/* Images */
+.inline-figure {
+    display: block;
+    width: 100%;
+    margin: 15px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px;
+    background-color: #f9f9f9;
+}
+.inline-figure img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 3px;
+}
+.inline-figure p {
+    color: #555;
+    font-size: 0.9em;
+    text-align: center;
+    margin: 5px 0 0;
+}
+
+/* Math & Tables */
+.table-responsive, .pre-responsive {
+    overflow-x: auto;
+    margin: 15px 0;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 300px;
+    border: 1px solid #c2f0c2;
+    font-size: 1rem;
+}
+th, td {
+    border: 1px solid #c2f0c2;
+    padding: 10px;
+    text-align: center;
+}
+th {
+    background-color: #e8f5e9;
+}
+
+/* Reusable Math styles */
+.math-example { /* UPDATED */
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    color: #d9006c;
+    font-size: 1.1em;
+    background-color: #fdf2f8;
+    padding: 15px; /* Increased padding */
+    border-radius: 8px; /* Slightly more rounded */
+    margin: 0; /* Margin is now handled by the grid wrapper */
+    width: 100%; /* Ensure it fills the grid cell */
+    height: 100%; /* Make all cards in a row the same height */
+    display: flex; /* Helps vertically align content if needed */
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+.math-pre {
+    white-space: pre;
+    font-size: 1.1em;
+}
+
+.math-example-grid { /* NEW */
+    display: grid;
+    grid-template-columns: 1fr; /* 1 column on mobile (default) */
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.fill-in-line {
+    display: inline-block;
+    min-width: 40px;
+    border-bottom: 1px solid #333;
+    margin: 0 5px;
+    padding: 0 2px;
+}
+.math-equation {
+    text-align: center;
+    padding: 20px;
+    margin: 20px 0;
+    font-size: 1.2em;
+    overflow-x: auto;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+}
+
+/* Math Grids */
+.math-exercise-grid, .math-equivalents-grid, .shopping-list-grid {
+    display: grid;
+    gap: 10px;
+    margin: 15px 0;
+}
+.math-exercise-grid {
+    grid-template-columns: 1fr; /* 1 column on mobile */
+}
+.math-equivalents-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */
+    text-align: center;
+}
+.shopping-list-grid {
+    grid-template-columns: 1fr auto; /* 2 columns for item/price */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+}
+.shopping-list-grid > span {
     padding: 5px 0;
-}
-
-.shopping-list-grid .list-item span:first-child {
-    font-weight: bold;
-    /* This span takes the first (auto) column */
-    text-align: left; 
     border-bottom: 1px dashed #eee;
 }
-
-.shopping-list-grid .list-item span:last-child {
-    /* This span takes the second (fixed width) column */
-    text-align: right; 
-    color: #FF6347; /* Make the price stand out */
+.shopping-list-grid > span:nth-child(odd) {
     font-weight: bold;
-    border-bottom: 1px dashed #eee;
+}
+.shopping-list-grid > span:nth-child(even) {
+    text-align: right;
+    font-weight: bold;
+    color: #FF6347;
 }
 
-/* --- Media Query Overrides (Desktop/Tablet) --- */
+/* ==================================== */
+/* 7. Card & Button Styles              */
+/* ==================================== */
 
-@media (min-width: 600px) {
-    /* ... (Keep existing CSS for other classes above this section) ... */
-
-    /* Shopping list on Desktop: Make it a single, clean block */
-    .shopping-list-grid {
-        grid-template-columns: 1fr max-content; /* Max-content for the prices */
-        max-width: 450px; /* Constrain width for a receipt look */
-        margin-left: 0;
-        margin-right: auto;
-    }
+.action-card {
+    background-color: #FF6347;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+    width: 100%;
 }
 
-    /* Four-column layout for math examples */
-    .math-equivalents-grid .math-item {
-        width: 23%; 
-        font-size: 1.2em;
-    }
-    .math-exercise-grid .math-item {
-        width: 45%; 
-    }
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
 }
 
-@media (min-width: 1024px) {
-    /* Large Desktop Tweaks */
-    .action-card {
-        width: 23%; /* Four cards per row on large desktop */
+.card-icon {
+    font-size: 3em;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.card-title {
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+/* Card Category Colors */
+.explore-button, .math-category { background-color: #00BFFF; }
+.translate-button, .english-category { background-color: #3CB371; }
+.games-button { background-color: #FFD700; color: #333; }
+.lucky-button { background-color: #9370DB; }
+.mock-test-button, .mock-test-entrance { background-color: #FFA500; }
+.science-category { background-color: #FF9800; }
+.history-category { background-color: #795548; }
+.psychology-category { background-color: #9C27B0; }
+.pedagogy-category { background-color: #4CAF50; }
+.misc-category { background-color: #FFEB3B; color: #333; }
+.mock-test-school { background-color: #388E3C; }
+.mock-test-nursing, .madhyamik-lang { background-color: #00BCD4; }
+.madhyamik-science { background-color: #4CAF50; }
+.madhyamik-maths { background-color: #2196F3; }
+.madhyamik-history, .madhyamik-geo { background-color: #FF9800; }
+.madhyamik-optional { background-color: #9C27B0; }
+
+/* ==================================== */
+/* 8. Media Queries (Tablet & Desktop)  */
+/* ==================================== */
+
+/* Tablet and larger */
+@media (min-width: 768px) {
+    :root {
+        --content-padding: 25px; /* Increase padding for larger screens */
+    }
+
+    /* --- Navigation --- */
+    .menu-toggle { display: none; }
+    .nav-left, .nav-right {
+        display: flex !important;
+        flex-direction: row;
+        width: auto;
+    }
+
+    /* --- Grids --- */
+    .button-grid-section, .lesson-grid-section {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .button-grid-section .action-card {
+        width: calc(50% - var(--card-gap)); /* 2 cards per row */
+        max-width: 300px;
     }
     .lesson-grid-section .action-card {
-        width: calc(25% - 15px); 
-        font-size: 1.3em;
+        width: calc(33.333% - var(--card-gap)); /* 3 cards per row */
+        max-width: 300px;
     }
-    .math-exercise-grid .math-item {
-        width: 23%; 
+
+    /* --- Lesson Content --- */
+    .inline-figure {
+        float: right;
+        width: 35%;
+        max-width: 300px;
+        margin: 5px 0 15px 20px;
+    }
+    .math-exercise-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns */
+    }
+    .math-equivalents-grid {
+        grid-template-columns: repeat(4, 1fr); /* 4 columns */
+    }
+    .shopping-list-grid {
+        max-width: 450px;
+    }
+    
+    .math-example-grid { /* NEW */
+        grid-template-columns: repeat(2, 1fr); /* 2 columns on tablet/desktop */
     }
 }
 
-/* --- New Section: Mock Test Colors (Add these to your style.css) --- */
+/* Desktop and larger */
+@media (min-width: 1024px) {
+    body {
+        font-size: 17px; /* Slightly increase base font size on large screens */
+    }
 
-/* School/Board Exams (E.g., Madhyamik, Class 11/12) */
-.mock-test-school { 
-    background-color: #388E3C; /* Darker Green */
+    .lesson-grid-section .action-card {
+        width: calc(25% - var(--card-gap)); /* 4 cards per row */
+    }
+
+    .math-exercise-grid {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns */
+    }
 }
 
-/* National Entrance Exams (JEE/NEET) */
-.mock-test-entrance { 
-    background-color: #FF5722; /* Deep Orange/Red */
-}
-
-/* Nursing Entrance Exams (ANM/GNM) */
-.mock-test-nursing { 
-    background-color: #00BCD4; /* Cyan/Teal */
-}
-
-/* --- New Section: Madhyamik Subject Colors --- */
-
-/* Language Subjects */
-.madhyamik-lang { 
-    background-color: #00BCD4; /* Cyan */
-}
-
-/* Core Science Subjects */
-.madhyamik-science { 
-    background-color: #4CAF50; /* Green */
-}
-
-/* Mathematics */
-.madhyamik-maths { 
-    background-color: #2196F3; /* Blue */
-}
-
-/* Humanities / History & Geography */
-.madhyamik-history, .madhyamik-geo { 
-    background-color: #FF9800; /* Orange */
-}
-
-/* Optional Subjects */
-.madhyamik-optional {
-    background-color: #9C27B0; /* Purple */
+main {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 20px var(--content-padding);
 }

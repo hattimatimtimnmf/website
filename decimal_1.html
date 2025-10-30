@@ -18,66 +18,7 @@
         };
     </script>
 
-    <style>
-        /* Define a safe margin for the whole content area */
-        :root {
-            --content-padding: 15px; /* Base padding for mobile */
-        }
-        
-        body {
-            font-family: 'Arial', sans-serif;
-            line-height: 1.6;
-            padding: 0; /* Removing body padding to let the container manage it */
-            background-color: #f7f7f7;
-            color: #333;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        
-        /* Apply padding directly to structural elements outside of main */
-        .navbar, .main-footer {
-            padding-left: var(--content-padding);
-            padding-right: var(--content-padding);
-        }
-
-        /* The main content area */
-        main {
-            max-width: 900px;
-            margin: 0 auto;
-            /* Apply horizontal padding here */
-            padding: 0 var(--content-padding); 
-        }
-
-        /* Clearing the float is critical for the responsive inline-figure style */
-        .clearfix::after {
-            content: "";
-            clear: both;
-            display: table;
-        }
-        
-        /* --- GLOBAL LIST FIX for Float Wrapping --- */
-        /* This pushes the list content (and list markers) away from the floating image */
-        .list-fix-ul, .list-fix-ol {
-            margin-left: 0; /* Standardize margin */
-            padding-left: 20px; /* Standardize padding for marker visibility */
-            clear: right; /* Ensure list doesn't start until the content clears the float */
-        }
-        
-        /* Media Query to increase padding on desktop/tablet */
-        @media (min-width: 600px) {
-            :root {
-                --content-padding: 20px;
-            }
-        }
-        
-        /* General layout styles (should be in style.css but kept for context) */
-        .info-box { background-color: #e6f7ff; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
-        .activity { background-color: #fff; padding: 15px; border: 1px dashed #ff9900; border-radius: 8px; margin-bottom: 20px; overflow: auto; }
-        .math-example, .math-pre { font-weight: bold; color: #cc33ff; margin: 10px 0; display: block; white-space: pre-wrap; }
-        .question { font-style: italic; color: #555; margin-top: 10px; }
-        
-        /* Table and Figure styles rely on classes defined in style.css */
-    </style>
+   
 </head>
 <body>
 
@@ -265,15 +206,7 @@
             <p>বাকি সংখ্যাগুলো তোমরা সাজাও: <strong>0.8, 1.7, 78.6, 352.01</strong></p>
 
         </div>
-        <div class="activity">
-            <h2>6. 🚀 বোনাস: বড়দের মজার অঙ্ক (The Normal Distribution)</h2>
-            <p>এই অঙ্কটা এখন তোমাদের জন্য নয়, কিন্তু বড় হয়ে তোমরা এটা শিখবে! এটি হলো <strong>Normal Distribution</strong> (নরমাল ডিস্ট্রিবিউশন)-এর সমীকরণ, যাকে "ঘণ্টা-আকৃতির রেখা" (Bell Curve) বলা হয়।</p>
-            
-            <div class="math-equation">
-                $$f(x) = \frac{1}{\sigma \sqrt{2\pi}} e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}$$
-            </div>
-            <p>এখানে $\mu$ (মিউ) মানে গড় (average) আর $\sigma$ (সিগমা) মানে কতটা ছড়িয়ে আছে (spread).</p>
-        </div>
+
     </main>
     <div id="footer-placeholder"></div>
 
