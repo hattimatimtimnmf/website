@@ -232,7 +232,7 @@ strong {
 }
 
 /* Math & Tables */
-.table-responsive, .pre-responsive {
+.table-responsive {
     overflow-x: auto;
     margin: 15px 0;
 }
@@ -252,33 +252,54 @@ th {
     background-color: #e8f5e9;
 }
 
-/* Reusable Math styles */
-.math-example { /* UPDATED */
+/* --- START: NEW/UPDATED MATH STYLES --- */
+
+/* The base for all informational boxes */
+.math-box {
+    background-color: #eef5ff; /* A calm, light blue */
+    border-left: 4px solid #007bff; /* An accent border */
+    padding: 10px;
+    margin: 15px 0;
     font-family: 'Courier New', Courier, monospace;
-    font-weight: bold;
-    color: #d9006c;
-    font-size: 1.1em;
-    background-color: #fdf2f8;
-    padding: 15px; /* Increased padding */
-    border-radius: 8px; /* Slightly more rounded */
-    margin: 0; /* Margin is now handled by the grid wrapper */
-    width: 100%; /* Ensure it fills the grid cell */
-    height: 100%; /* Make all cards in a row the same height */
-    display: flex; /* Helps vertically align content if needed */
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-.math-pre {
-    white-space: pre;
-    font-size: 1.1em;
+    font-size: 1em;
+    color: #334155; /* A softer dark blue-gray for text */
+    border-radius: 0 8px 8px 0; /* Rounded corners on one side */
+    overflow-x: auto; /* Ensures long content wraps nicely */
 }
 
-.math-example-grid { /* NEW */
+/* A dedicated style for pre-formatted math/code blocks */
+.math-code-block {
+    background-color: #f8f9fa; /* A very light gray */
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto; /* This is crucial for responsiveness */
+}
+
+.math-code-block pre {
+    margin: 0;
+    padding: 0;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.1em;
+    color: #333;
+    white-space: pre; /* Preserves formatting */
+    background-color: transparent; /* Inherits from parent */
+}
+
+/* A flexible grid for laying out content */
+.content-grid, .math-example-grid {
     display: grid;
     grid-template-columns: 1fr; /* 1 column on mobile (default) */
     gap: 20px;
     margin: 20px 0;
+}
+
+/* Style items inside the grid */
+.math-example-grid .math-box {
+    margin: 0; /* The grid's "gap" property handles spacing */
+    width: 100%;
+    text-align: center;
 }
 
 .fill-in-line {
@@ -288,6 +309,7 @@ th {
     margin: 0 5px;
     padding: 0 2px;
 }
+
 .math-equation {
     text-align: center;
     padding: 20px;
@@ -299,7 +321,7 @@ th {
     border-radius: 5px;
 }
 
-/* Math Grids */
+/* Other Math Grids */
 .math-exercise-grid, .math-equivalents-grid, .shopping-list-grid {
     display: grid;
     gap: 10px;
@@ -330,6 +352,8 @@ th {
     font-weight: bold;
     color: #FF6347;
 }
+
+/* --- END: NEW/UPDATED MATH STYLES --- */
 
 /* ==================================== */
 /* 7. Card & Button Styles              */
@@ -432,7 +456,7 @@ th {
         max-width: 450px;
     }
     
-    .math-example-grid { /* NEW */
+    .content-grid, .math-example-grid {
         grid-template-columns: repeat(2, 1fr); /* 2 columns on tablet/desktop */
     }
 }
@@ -450,10 +474,4 @@ th {
     .math-exercise-grid {
         grid-template-columns: repeat(3, 1fr); /* 3 columns */
     }
-}
-
-main {
-    max-width: 1080px;
-    margin: 0 auto;
-    padding: 20px var(--content-padding);
 }
