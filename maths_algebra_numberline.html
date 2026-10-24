@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Number Line Explorer</title>
+<style>
+  :root{
+    --bg:#f3f7ff; --card:#ffffff; --ink:#1e293b; --muted:#64748b;
+    --blue:#3b82f6; --green:#16a34a; --red:#dc2626; --amber:#f59e0b; --line:#334155;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none !important}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+  main{max-width:900px;margin:0 auto;padding:16px}
+  h1{text-align:center;margin:12px 0 4px;font-size:2rem}
+  .sub{text-align:center;color:var(--muted);margin:0 0 20px}
+
+  /* ---------- Home ---------- */
+  .cards{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .card{background:var(--card);border:3px solid #dbe5f7;border-radius:18px;padding:22px 16px;text-align:center;
+        cursor:pointer;font:inherit;color:inherit;box-shadow:0 3px 0 #dbe5f7}
+  .card:hover,.card:focus-visible{border-color:var(--blue);outline:none}
+  .card .big{font-size:2.4rem;font-weight:800;color:var(--blue)}
+  .card h3{margin:8px 0 4px;font-size:1.3rem}
+  .card p{margin:0;color:var(--muted)}
+
+  /* ---------- Learning screen ---------- */
+  .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+  .top h2{margin:0;font-size:1.25rem;flex:1}
+  #progress{color:var(--muted);font-size:.85rem;line-height:1.5}
+  .question{background:var(--card);border-radius:16px;padding:12px 16px;text-align:center;border:2px solid #dbe5f7}
+  #qLabel{color:var(--muted);font-size:.9rem;line-height:1.4;margin-bottom:4px}
+  #expr{font-size:2.3rem;font-weight:800;letter-spacing:1px}
+  .part{display:inline-block;padding:0 10px;border-radius:12px;transition:background .25s,opacity .25s,box-shadow .25s}
+  #expr.focus .part:not(.hl){opacity:.35}
+  .part.hl{background:#fde68a;box-shadow:0 0 0 4px var(--amber)}
+
+  .stage{position:relative;background:var(--card);border:2px solid #dbe5f7;border-radius:16px;margin:12px 0;overflow:hidden}
+  .axis{position:absolute;left:10px;right:10px;height:5px;background:var(--line);border-radius:3px}
+  .tick{position:absolute;width:2px;height:16px;background:var(--line);transform:translateX(-50%)}
+  .tick.zero{width:4px;height:26px;background:var(--red)}
+  .tlabel{position:absolute;transform:translateX(-50%);font-size:.85rem;font-weight:600;color:var(--ink)}
+  .tlabel.zero{color:var(--red);font-size:1rem;font-weight:800}
+  .side{position:absolute;bottom:6px;font-size:.78rem;color:var(--muted)}
+  #goal{position:absolute;min-width:38px;padding:2px 6px;text-align:center;transform:translateX(-50%);
+        border:3px solid var(--amber);background:#fef3c7;border-radius:10px;font-weight:800}
+
+  #robot{position:absolute;left:0;top:0}
+  #bob,#flip{display:block}
+  #flip{transition:transform .6s ease-in-out}
+  #robot.walking #bob{animation:bob .35s ease-in-out infinite alternate}
+  @keyframes bob{from{transform:translateY(0)}to{transform:translateY(-4px)}}
+  @keyframes swing{from{transform:rotate(-28deg)}to{transform:rotate(28deg)}}
+  #robot svg .limb{transform-box:view-box}
+  .l1{transform-origin:59px 84px}.l2{transform-origin:49px 84px}
+  .a1,.a2{transform-origin:50px 52px}
+  #robot.walking .l1,#robot.walking .a2{animation:swing .5s ease-in-out infinite alternate}
+  #robot.walking .l2,#robot.walking .a1{animation:swing .5s ease-in-out infinite alternate-reverse}
+  #robot.walking.back .l1,#robot.walking.back .a2{animation-direction:alternate-reverse}
+  #robot.walking.back .l2,#robot.walking.back .a1{animation-direction:alternate}
+
+  .chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:8px}
+  .chip{background:#e0ecff;border-radius:999px;padding:6px 14px;font-weight:600;font-size:.95rem}
+  .instruction{background:#fff8e1;border:2px solid #fde68a;border-radius:14px;padding:12px 14px;min-height:56px;font-size:1.05rem}
+
+  /* questions */
+  .quiz{margin-top:10px;background:var(--card);border:2px solid #c7d8f5;border-radius:14px;padding:6px 14px 10px}
+  .qrow{margin:10px 0}
+  .qrow .qt{font-weight:700;margin-bottom:6px}
+  .opts{display:flex;gap:8px;flex-wrap:wrap}
+  .opt{font:inherit;font-weight:700;font-size:1.05rem;min-height:50px;min-width:130px;flex:1;border-radius:12px;
+       border:3px solid #cbd5e1;background:#fff;color:var(--ink);cursor:pointer}
+  .opt.small{flex:0 0 auto;min-width:50px;min-height:46px;padding:0 10px}
+  .opt:hover:not(:disabled){border-color:var(--blue)}
+  .opt:disabled{cursor:default;color:var(--ink)}
+  .opt.picked{border-color:var(--blue);background:#e0ecff}
+  .opt.right{border-color:var(--green);background:#dcfce7}
+  .opt.wrong{border-color:var(--red);background:#fee2e2}
+  #stepFeedback{margin-top:8px;padding:10px 12px;border-radius:12px;font-weight:700}
+  #stepFeedback.good{background:#dcfce7;color:#166534}
+  #stepFeedback.bad{background:#fee2e2;color:#991b1b}
+  .toggle{display:flex;align-items:center;gap:8px;justify-content:center;margin:10px 0 0;font-weight:600}
+  .toggle input{width:22px;height:22px}
+
+  .controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin:12px 0}
+  .btn{font:inherit;font-weight:700;border:0;border-radius:14px;padding:14px 12px;min-height:50px;cursor:pointer;
+       background:var(--blue);color:#fff;box-shadow:0 3px 0 rgba(0,0,0,.18)}
+  .btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
+  .btn.alt{background:#fff;color:var(--ink);border:2px solid #cbd5e1}
+  .btn.green{background:var(--green)}
+  .btn.ghost{background:transparent;color:var(--blue);box-shadow:none;border:2px solid var(--blue);min-height:44px;padding:8px 14px}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  #answerBox{margin-top:10px;background:#dcfce7;border:2px solid #86efac;border-radius:14px;padding:12px 14px;font-size:1.15rem}
+  .score{background:#fef3c7;border:2px solid var(--amber);border-radius:999px;padding:6px 14px;font-weight:800;font-size:1.05rem;white-space:nowrap}
+  .btn.end{background:#fff;color:var(--red);border:2px solid var(--red);box-shadow:none;min-height:44px;padding:8px 14px}
+  .qhead{display:flex;justify-content:center;margin-top:8px}
+  .qhead .btn{min-height:40px;padding:6px 16px}
+  #endScreen{position:fixed;inset:0;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
+  .endcard{background:var(--card);border-radius:20px;padding:24px;max-width:420px;width:100%;text-align:center}
+  .endcard h2{margin:0 0 6px}
+  .endcard .big{font-size:3rem;font-weight:800;color:var(--blue)}
+  .endcard p{color:var(--muted);font-size:1.05rem}
+  .endcard .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .endcard .btns .btn{flex:1;min-width:130px}
+  .levelbox{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-weight:700}
+  .levelbox select{font:inherit;font-weight:600;padding:10px;border-radius:10px;border:2px solid #cbd5e1;max-width:100%;flex:1}
+
+  body{font-family:system-ui,-apple-system,"Segoe UI","Noto Sans Bengali","Nirmala UI",Vrinda,Roboto,sans-serif}
+  .lang{display:flex;justify-content:center;margin:6px 0 4px}
+  .lang button{font:inherit;font-weight:700;padding:8px 20px;border:2px solid var(--blue);background:#fff;color:var(--blue);cursor:pointer}
+  .lang button:first-child{border-radius:999px 0 0 999px;border-right-width:1px}
+  .lang button:last-child{border-radius:0 999px 999px 0;border-left-width:1px}
+  .lang button.on{background:var(--blue);color:#fff}
+  .toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+  .toolbar .toggle{margin:0;justify-content:flex-start}
+  .tbtns{display:flex;gap:8px;margin-left:auto}
+  .btn.sm{min-height:34px;padding:6px 12px;font-size:.85rem;border-radius:10px;box-shadow:none}
+  .controls{grid-template-columns:1fr}
+  #nextBtn{font-size:1.1rem;min-height:56px}
+  #nextBtn:not(:disabled){animation:pulse 1.5s ease-in-out infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 3px 0 rgba(0,0,0,.18),0 0 0 0 rgba(22,163,74,.45)}50%{box-shadow:0 3px 0 rgba(0,0,0,.18),0 0 0 8px rgba(22,163,74,0)}}
+  #trail{position:absolute;left:0;top:0;pointer-events:none}
+
+  /* ---------- Subtraction rule: two sums side by side ---------- */
+  .rgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));margin-top:12px}
+  .rcol .question{padding:10px 12px}
+  .rtag{color:var(--muted);font-size:.9rem;font-weight:700;margin-bottom:4px}
+  .rexpr{font-size:clamp(1.25rem,4.6vw,1.8rem);font-weight:800;letter-spacing:1px}
+  .rexpr .part{padding:0 6px}
+  .rexpr.focus .part:not(.hl){opacity:.35}
+  .rstage{margin:8px 0 0}
+  .rtrail{position:absolute;left:0;top:0;pointer-events:none}
+  .rgoal{position:absolute;min-width:38px;padding:2px 6px;text-align:center;transform:translateX(-50%);
+         border:3px solid var(--amber);background:#fef3c7;border-radius:10px;font-weight:800}
+  .rrobot{position:absolute;left:0;top:0}
+  .rbob,.rflip{display:block}
+  .rflip{transition:transform .6s ease-in-out}
+</style>
+</head>
+<body>
+<main>
+
+  <!-- ============ HOME ============ -->
+  <section id="home">
+    <div class="lang" role="group" aria-label="Language"><button data-lang="en">English</button><button data-lang="bn">বাংলা</button></div>
+    <h1 data-t="title"></h1>
+    <p class="sub" data-t="sub"></p>
+    <div class="cards">
+      <button class="card" data-mode="numbers"><div class="big">+ / &minus;</div><h3 data-t="cNum"></h3><p data-t="cNumD"></p></button>
+      <button class="card" data-mode="addsub"><div class="big">+ &minus;</div><h3 data-t="cAdd"></h3><p data-t="cAddD"></p></button>
+      <button class="card" data-mode="mul"><div class="big">&times;</div><h3 data-t="cMul"></h3><p data-t="cMulD"></p></button>
+      <button class="card" data-mode="subrule"><div class="big">&minus; &rarr; +</div><h3 data-t="cRule"></h3><p data-t="cRuleD"></p></button>
+    </div>
+  </section>
+
+  <!-- ============ LEARNING SCREEN ============ -->
+  <section id="learn" hidden>
+    <div class="top">
+      <button class="btn ghost" id="backBtn" data-t="home"></button>
+      <h2 id="topic"></h2>
+      <div class="score" id="scoreBox"></div>
+    </div>
+    <div class="toolbar">
+      <label class="toggle"><input type="checkbox" id="quizToggle" checked> <span data-t="ask"></span></label>
+      <span class="tbtns">
+        <button class="btn sm alt" id="resetBtn" data-t="reset"></button>
+        <button class="btn sm end" id="endBtn" data-t="endBtn"></button>
+      </span>
+    </div>
+    <label class="levelbox" id="levelBox" hidden><span data-t="level"></span> <select id="levelSel"></select></label>
+
+    <div class="question">
+      <div id="progress"></div>
+      <div id="qLabel"></div>
+      <div id="expr"></div>
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="axis" id="axis"></div>
+      <div id="ticks"></div>
+      <svg id="trail" aria-hidden="true"></svg>
+      <div id="goal" hidden></div>
+      <div id="robot"><div id="bob"><div id="flip"></div></div></div>
+      <span class="side" style="left:10px" data-t="negSide"></span>
+      <span class="side" style="right:10px" data-t="posSide"></span>
+    </div>
+
+    <div id="ruleArea" hidden>
+      <div class="rgrid">
+        <div class="rcol" id="rcolL"></div>
+        <div class="rcol" id="rcolR"></div>
+      </div>
+    </div>
+
+    <div class="chips" id="chips">
+      <span class="chip" id="chipPos"></span>
+      <span class="chip" id="chipFace"></span>
+      <span class="chip" id="chipMove"></span>
+    </div>
+
+    <div class="instruction" id="instruction"></div>
+    <div class="quiz" id="quiz" hidden></div>
+    <div id="stepFeedback" hidden></div>
+
+    <div id="answerBox" hidden></div>
+    <div class="controls">
+      <button class="btn green" id="nextBtn" disabled data-t="next"></button>
+    </div>
+  </section>
+
+  <!-- ============ END SCREEN ============ -->
+  <div id="endScreen" hidden role="dialog" aria-modal="true" aria-labelledby="endTitle">
+    <div class="endcard">
+      <h2 id="endTitle" data-t="endTitle"></h2>
+      <div class="big" id="endScore"></div>
+      <p id="endMsg"></p>
+      <div class="btns">
+        <button class="btn green" id="againBtn" data-t="again"></button>
+        <button class="btn alt" id="homeBtn2" data-t="home2"></button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+/* =====================================================================
+   SETTINGS  (change things here)
+   ===================================================================== */
+const CONFIG = {
+  /* ---- ROBOT IMAGE ----
+     Leave robotImage as "" to use the built-in cartoon robot (drawn in code).
+     To use your own picture, put a file path or URL here, e.g. "robot.png".
+     The picture must show the character from the SIDE, FACING RIGHT.
+     If your picture faces LEFT, set imageFacesRight to false.            */
+  robotImage: "",
+  imageFacesRight: true,
+  robotWidth: 64,       // pixels
+  robotHeight: 77,      // pixels
+
+  /* ---- ANIMATION (milliseconds) ---- */
+  hopMs: 380,           // time for one leap (plus hopMsPerUnit for each unit it covers)
+  hopMsPerUnit: 40,
+  maxHopMs: 700,
+  hopPauseMs: 130,      // the robot lands and pauses before the next leap
+  partPauseMs: 1800,    // pause after a part, then the next part starts by itself
+  startDelayMs: 600,    // pause before a new problem starts by itself
+  bengaliDigits: false, // false = always show English numerals (0123…), even in Bengali
+  turnMs: 700,          // time for the 180 degree turn
+  explainMs: 2400,      // reading time before a part starts (when questions are OFF)
+  afterAnswerMs: 1400,  // time to see "Right / Not quite" before the robot moves
+
+  /* ---- QUESTIONS ---- */
+  askMoveDirection: true,   // also ask "which way will it move on the number line?"
+
+  /* ---- DIFFICULTY ----
+     ranges[mode][level] = biggest absolute value used at that level.
+     Level goes up after every "correctPerLevel" sums where every prediction was right.
+     Zero is used from level index "zeroFromLevel".                        */
+  ranges: { numbers:[5,8,12], mul:[3,5,9], subrule:[4,6,8] },
+  ruleHopMs: 380,       // Subtraction Rule screen: time for one 1-unit hop
+  rulePauseMs: 130,     // pause after each hop there
+  correctPerLevel: 3,
+  /* Addition & Subtraction uses the 6 levels listed in ADDSUB_LEVELS below.
+     The level goes up after this many sums where every prediction was right. The child (or
+     teacher) can also pick any level from the Level menu.                  */
+  addsubCorrectPerLevel: 5,
+  zeroFromLevel: 1,
+
+  minRange: 6           // number line always shows at least -6 .. 6
+};
+
+/* =====================================================================
+   MATH + PHASE LOGIC  (no page code in this part)
+   A question is split into PARTS ("phases"):
+     numbers : [number]
+     add/sub : [first number] [sign] [second number]
+     multiply: [first number] [second number]
+   Each part has: which piece of the expression to highlight (hl),
+   a short intro, questions for the child, the robot steps, and the
+   explanation shown afterwards.
+   ===================================================================== */
+let LANG = "en";
+const D = s => (LANG === "bn" && CONFIG.bengaliDigits) ? String(s).replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[d]) : String(s);
+const MINUS = "−";
+const fmt = n => n < 0 ? MINUS + D(Math.abs(n)) : D(n);
+const par = n => n < 0 ? "(" + fmt(n) + ")" : fmt(n);
+const tr = (k, ...a) => { const e = S[k], v = e[LANG] !== undefined ? e[LANG] : e.en; return typeof v === "function" ? v(...a) : v; };
+const u = n => tr("unit", n);
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const sg = v => tr(v > 0 ? "pos" : "neg");
+const wk = fwd => tr(fwd ? "fwd" : "back");
+const fd = x => tr(x === 1 ? "faceR" : "faceL");
+const wd = v => S[v] ? tr(v) : D(v);
+const pn = n => "(" + (n < 0 ? MINUS : "+") + D(Math.abs(n)) + ")";   // explicit sign: (+3) or (−3)
+const BN_LEVEL = ["সহজ যোগ", "সহজ বিয়োগ", "উত্তর শূন্য", "শূন্যের খেলা", "ছোট-বড় মাপ ও শূন্য পার হওয়া", "সব রকম মিশিয়ে"];
+const PAT_BN = { "random addition":"যেকোনো যোগ", "random subtraction":"যেকোনো বিয়োগ", "random, with a zero":"শূন্য দিয়ে যেকোনো", 
+                 "random, equal sizes":"যেকোনো, সমান মাপের", "random, different sizes":"যেকোনো, আলাদা মাপের" };
+const lvName = i => LANG === "bn" ? BN_LEVEL[i] : ADDSUB_LEVELS[i].name;
+const patT = p => LANG === "bn" ? p.replace(/random addition|random subtraction|random, with a zero|random, equal sizes|random, different sizes/, m => PAT_BN[m]) : p;
+
+/* ---------- ALL TEXT, English (en) and Bengali (bn) ---------- */
+const S = {
+  /* words */
+  unit:{ en:n => n + " unit" + (n === 1 ? "" : "s"), bn:n => D(n) + " ঘর" },
+  left:{ en:"left", bn:"বাঁ দিকে" }, right:{ en:"right", bn:"ডান দিকে" },
+  fwd:{ en:"forward", bn:"সামনের দিকে" }, back:{ en:"backward", bn:"পেছনের দিকে" },
+  turn:{ en:"turn around", bn:"ঘুরে দাঁড়াবে" }, stay:{ en:"don't turn", bn:"ঘুরবে না" },
+  faceR:{ en:"right", bn:"ডান দিকে" }, faceL:{ en:"left", bn:"বাঁ দিকে" },
+  pos:{ en:"positive", bn:"পজিটিভ (+)" }, neg:{ en:"negative", bn:"নেগেটিভ (-)" },
+  optL:{ en:"← Left", bn:"← বাঁ দিকে" }, optR:{ en:"Right →", bn:"ডান দিকে →" },
+  optTurn:{ en:"Turn around 180°", bn:() => D(180) + "° ঘুরে দাঁড়াবে" }, optStay:{ en:"Don't turn", bn:"ঘুরবে না" },
+  /* questions */
+  qDir:{ en:"Will it walk forward or backward?", bn:"রোবট কি সামনে হাঁটবে, নাকি পেছনে?" },
+  qUnits:{ en:"How many units will it walk?", bn:"রোবট কয় ঘর হাঁটবে?" },
+  qSize:{ en:"How big is each step?", bn:"এক একটা লাফ কতটা বড়?" },
+  qSteps:{ en:"How many steps will it take?", bn:"রোবট কটা লাফ দেবে?" },
+  qFace:{ en:"Which way will the robot face?", bn:"রোবট কোন দিকে মুখ করে থাকবে?" },
+  qMove:{ en:"So which way will it move on the number line?", bn:"তাহলে সংখ্যারেখায় সে কোন দিকে সরবে?" },
+  qTurn:{ en:"Will the robot turn around?", bn:"রোবট কি ঘুরে দাঁড়াবে?" },
+  nmWalking:{ en:"Walking", bn:"হাঁটা" }, nmUnits:{ en:"Units", bn:"ঘর" }, nmSize:{ en:"Step size", bn:"লাফের মাপ" },
+  nmSteps:{ en:"Steps", bn:"লাফ" }, nmFacing:{ en:"Facing", bn:"মুখ" }, nmMoving:{ en:"Moving", bn:"সরা" }, nmTurning:{ en:"Turning", bn:"ঘোরা" },
+  /* explanations: numbers + add/sub */
+  nIntro:{ en:a => `Start at 0, facing right. Look at the number ${fmt(a)}.`, bn:a => `শূন্য (${D(0)}) থেকে শুরু করো, মুখ ডান দিকে। সংখ্যাটা দেখো: ${fmt(a)}।` },
+  walkDone:{ en:(a, n) => `${fmt(a)} is ${sg(a)}, so the robot walks ${wk(a > 0)} ${u(n)} and reaches ${fmt(a)}.`,
+             bn:(a, n) => `${fmt(a)} হলো ${sg(a)}, তাই রোবট ${wk(a > 0)} ${u(n)} হেঁটে ${fmt(a)}-এ পৌঁছায়।` },
+  stillNeg:{ en:" It still faces right. A negative number takes us to the left of zero.", bn:" ওর মুখ এখনও ডান দিকেই আছে। নেগেটিভ সংখ্যা আমাদের শূন্যের বাঁ দিকে নিয়ে যায়।" },
+  still:{ en:" It is still facing right.", bn:" ওর মুখ এখনও ডান দিকেই আছে।" },
+  nZero:{ en:"Zero means no walking. Zero is neither positive nor negative. The robot stays at 0.", bn:() => `শূন্য মানেই কোনো হাঁটা নেই। শূন্য পজিটিভও না, নেগেটিভও না। রোবট ${D(0)}-তেই দাঁড়িয়ে থাকবে।` },
+  a1Intro:{ en:a => `Start at 0, facing right. Look at the first number ${fmt(a)}.`, bn:a => `শূন্য (${D(0)}) থেকে শুরু করো, মুখ ডান দিকে। প্রথম সংখ্যাটা দেখো: ${fmt(a)}।` },
+  a1Zero:{ en:"The first number is 0, so the robot stays at 0.", bn:() => `প্রথম সংখ্যাটা ${D(0)}, তাই রোবট ${D(0)}-তেই দাঁড়িয়ে থাকবে।` },
+  a2Intro:{ en:a => `The robot is at ${fmt(a)}, facing right. Now look at the sign between the numbers.`, bn:a => `রোবট এখন ${fmt(a)}-এ দাঁড়িয়ে, মুখ ডান দিকে। এবার দুটো সংখ্যার মাঝের চিহ্নটা দেখো।` },
+  a2TurnStep:{ en:"Subtraction: the robot turns around 180°. Now it faces left.", bn:() => `বিয়োগ চিহ্ন: রোবট ${D(180)}° ঘুরে গেল। এখন ওর মুখ বাঁ দিকে।` },
+  a2Sub:{ en:"Subtraction means turn around 180°. The robot now faces left.", bn:() => `বিয়োগ মানে ${D(180)}° ঘুরে দাঁড়ানো। রোবটের মুখ এখন বাঁ দিকে।` },
+  a2Add:{ en:"Addition means no turn. The robot keeps facing right.", bn:"যোগ মানে ঘোরার দরকার নেই। রোবটের মুখ ডান দিকেই থাকবে।" },
+  a3Intro:{ en:(b, f) => `Now look at the second number ${fmt(b)}. The robot is facing ${fd(f)}.`, bn:(b, f) => `এবার দ্বিতীয় সংখ্যাটা দেখো: ${fmt(b)}। রোবটের মুখ এখন ${fd(f)}।` },
+  a3Zero:{ en:"The second number is 0, so the robot does not move.", bn:() => `দ্বিতীয় সংখ্যাটা ${D(0)}, তাই রোবট একচুলও নড়বে না।` },
+  sideDone:{ en:(b, n, f, sd, p) => `${fmt(b)} is ${sg(b)}, so the robot walks ${wk(b > 0)} ${u(n)}. Facing ${fd(f)}, that moves it to the ${sd}. It stops at ${fmt(p)}.`,
+             bn:(b, n, f, sd, p) => `${fmt(b)} হলো ${sg(b)}, তাই রোবট ${wk(b > 0)} ${u(n)} হাঁটবে। মুখ ${fd(f)} থাকায় ও ${sd} সরে যাবে। ও থামবে গিয়ে ${fmt(p)}-এ।` },
+  /* explanations: multiplication */
+  m1Intro:{ en:a => `Start at 0. Look at the first number ${fmt(a)}. It gives the step size and the way the robot faces.`,
+            bn:a => `${D(0)} থেকে শুরু করো। প্রথম সংখ্যাটা দেখো: ${fmt(a)}। এটা বলে দেয় এক একটা লাফ কতটা বড় হবে আর রোবটের মুখ কোন দিকে থাকবে।` },
+  m1Turn:{ en:"The first number is negative, so the robot turns to face left.", bn:"প্রথম সংখ্যাটা নেগেটিভ, তাই রোবট ঘুরে বাঁ দিকে মুখ করবে।" },
+  m1Zero:{ en:"The first number is 0, so every step has size 0.", bn:() => `প্রথম সংখ্যাটা ${D(0)}, তাই প্রতিটা লাফের মাপই ${D(0)}।` },
+  m1Done:{ en:(a, s) => `${fmt(a)} is ${sg(a)}, so the robot faces ${fd(a > 0 ? 1 : -1)}. Each step is ${u(s)} long.`,
+           bn:(a, s) => `${fmt(a)} হলো ${sg(a)}, তাই রোবট ${fd(a > 0 ? 1 : -1)} মুখ করবে। এক একটা লাফ ${u(s)} লম্বা।` },
+  m2Intro:{ en:(b, f) => `Now look at the second number ${fmt(b)}. It gives the number of steps and whether to walk forward or backward. The robot is facing ${fd(f)}.`,
+            bn:(b, f) => `এবার দ্বিতীয় সংখ্যাটা দেখো: ${fmt(b)}। এটা বলে দেয় কটা লাফ দিতে হবে আর সামনে না পেছনে হাঁটতে হবে। রোবটের মুখ এখন ${fd(f)}।` },
+  m2Zero:{ en:"The step size or the number of steps is 0, so the robot does not move. The answer is 0.", bn:() => `লাফের মাপ বা লাফের সংখ্যা ${D(0)}, তাই রোবট নড়বে না। উত্তর ${D(0)}।` },
+  m2Done:{ en:(b, c, s, f, sd, p) => `${fmt(b)} is ${sg(b)}, so the robot walks ${wk(b > 0)} ${c} time${c > 1 ? "s" : ""}, ${u(s)} each time. Facing ${fd(f)} and walking ${wk(b > 0)} moves it to the ${sd}. It stops at ${fmt(p)}.`,
+           bn:(b, c, s, f, sd, p) => `${fmt(b)} হলো ${sg(b)}, তাই রোবট ${wk(b > 0)} ${D(c)} বার লাফাবে, প্রতিবার ${u(s)}। মুখ ${fd(f)} রেখে ${wk(b > 0)} লাফ দিলে ও ${sd} সরে যাবে। ও থামবে গিয়ে ${fmt(p)}-এ।` },
+  step:{ en:(k, n, fwd, s, f, p) => `Step ${k} of ${n}: hop ${wk(fwd)} ${u(s)} (facing ${fd(f)}). Now at ${fmt(p)}.`,
+         bn:(k, n, fwd, s, f, p) => `লাফ ${D(k)}/${D(n)}: ${wk(fwd)} ${u(s)} (মুখ ${fd(f)})। এখন ${fmt(p)}-এ।` },
+  /* subtraction rule practice */
+  minus:{ en:"−", bn:"−" }, plus:{ en:"+", bn:"+" }, yes:{ en:"Yes", bn:"হ্যাঁ" }, no:{ en:"No", bn:"না" },
+  lLeft:{ en:"Left sum", bn:"বাঁ দিকের অঙ্ক" }, lRight:{ en:"Right sum", bn:"ডান দিকের অঙ্ক" },
+  rIntro:{ en:"Two sums are given side by side. Both robots start at 0, facing right. Watch them walk.",
+           bn:() => `পাশাপাশি দুটো অঙ্ক দেওয়া আছে। দুটো রোবটই ${D(0)} থেকে শুরু করবে, মুখ ডান দিকে। ওদের হাঁটা দেখো।` },
+  rLeftGo:{ en:"First the left sum. The robot walks the first number, turns around at the minus sign, then walks the second number.",
+            bn:"আগে বাঁ দিকের অঙ্ক। রোবট প্রথম সংখ্যা অনুযায়ী হাঁটবে, বিয়োগ চিহ্নে ঘুরে দাঁড়াবে, তারপর দ্বিতীয় সংখ্যা অনুযায়ী হাঁটবে।" },
+  rRightGo:{ en:"Now the right sum. This robot never turns. It walks the first number, then the second number.",
+             bn:"এবার ডান দিকের অঙ্ক। এই রোবট ঘুরবে না। প্রথম সংখ্যা অনুযায়ী হাঁটবে, তারপর দ্বিতীয় সংখ্যা অনুযায়ী।" },
+  rLook:{ en:"The robots have stopped. Now look carefully at the two sums.", bn:"রোবট দুটো থেমে গেছে। এবার অঙ্ক দুটো ভালো করে লক্ষ করো।" },
+  rConclude:{ en:"What did we learn? Put a plus sign in place of the minus sign, and flip the sign of the second number. The answer stays the same! This is how a subtraction sum can be changed into an addition sum. The number we get by flipping the sign of a number is called its opposite number.",
+              bn:"তাহলে কী বুঝলে? মাঝখানের বিয়োগের চিহ্নের জায়গায় যোগের চিহ্ন বসালে দ্বিতীয় সংখ্যাটির চিহ্ন উল্টে দিলেও উত্তর একই থাকে! এইভাবে বিয়োগের অঙ্ককে যোগের অঙ্কে বদলে নেওয়া যায়। দ্বিতীয় সংখ্যাটির চিহ্ন উল্টে যে সংখ্যা পাওয়া যায়, তাকে ওই সংখ্যার বিপরীত সংখ্যা বলে।" },
+  rAns:{ en:p => "Answer: both sums give " + fmt(p), bn:p => "উত্তর: দুটো অঙ্কেরই উত্তর " + fmt(p) },
+  rOpp:{ en:b => "The opposite of " + pn(b) + " is " + pn(-b) + ".", bn:b => pn(b) + "-এর বিপরীত সংখ্যা " + pn(-b) + "।" },
+  qRL:{ en:"Which sign is in the middle of the left sum?", bn:"বাঁ দিকের অঙ্কটিতে মাঝখানে কোন চিহ্ন আছে?" },
+  qRR:{ en:"Which sign is in the middle of the right sum?", bn:"ডান দিকের অঙ্কটিতে মাঝখানে কোন চিহ্ন আছে?" },
+  qRFirst:{ en:"Is the first number the same in both sums?", bn:"দুটি অঙ্কে প্রথম সংখ্যাটি কি একই?" },
+  qRSecond:{ en:"Look at the sign before the second number. Is it the same in both sums?", bn:"দ্বিতীয় সংখ্যাটির আগে কোন চিহ্ন আছে? দুটি অঙ্কে কি সেই চিহ্ন একই?" },
+  qRAns:{ en:"Are the answers of the two sums the same?", bn:"দুটি অঙ্কের উত্তর কি একই?" },
+  nmRL:{ en:"Left sign", bn:"বাঁ দিকের চিহ্ন" }, nmRR:{ en:"Right sign", bn:"ডান দিকের চিহ্ন" },
+  nmRFirst:{ en:"First number", bn:"প্রথম সংখ্যা" }, nmRSecond:{ en:"Second number's sign", bn:"দ্বিতীয় সংখ্যার চিহ্ন" },
+  nmRAns:{ en:"Answers", bn:"উত্তর" },
+  cRule:{ en:"Subtraction Rule Practice", bn:"বিয়োগের নিয়ম প্র্যাকটিস" },
+  cRuleD:{ en:"Turn a subtraction into an addition.", bn:"বিয়োগের অঙ্ককে যোগের অঙ্কে বদলে নাও।" },
+  lRule:{ en:"Compare the two sums", bn:"অঙ্ক দুটো মিলিয়ে দেখো" },
+  /* page */
+  title:{ en:"Number Line Explorer", bn:"সংখ্যারেখায় দৌড়াদৌড়ি" },
+  sub:{ en:"Pick a topic. Watch the robot walk. Learn the rule.", bn:"যেকোনো একটা বেছে নাও। রোবটের লাফ দেখো। নিয়মটা শিখে নাও।" },
+  cNum:{ en:"Numbers", bn:"সংখ্যা চেনা" }, cNumD:{ en:"Explore positive and negative numbers.", bn:"পজিটিভ আর নেগেটিভ সংখ্যা নিয়ে খেলা করো।" },
+  cAdd:{ en:"Addition & Subtraction", bn:"যোগ ও বিয়োগ" }, cAddD:{ en:"Walk, turn and discover the result.", bn:"হাঁটো, ঘোরো আর উত্তরটা খুঁজে বের করো।" },
+  cMul:{ en:"Multiplication", bn:"গুণ করা" }, cMulD:{ en:"Explore step size and repeated movement.", bn:"লাফের মাপ আর বারবার একই দিকে যাওয়া শেখো।" },
+  lNum:{ en:"Where does the robot end up?", bn:"রোবট কোথায় গিয়ে পৌঁছাবে?" },
+  lAdd:{ en:"Walk, turn, and find the answer", bn:"হাঁটো, ঘোরো আর উত্তর খোঁজো" },
+  lMul:{ en:"Step size and number of steps", bn:"লাফের মাপ আর লাফের সংখ্যা" },
+  home:{ en:"← Home", bn:"← হোম" }, endBtn:{ en:"End game", bn:"খেলা শেষ" }, reset:{ en:"↺ Reset", bn:"↺ আবার প্রথম থেকে" },
+  next:{ en:"Next ›", bn:"পরেরটা ›" },
+  ask:{ en:"Ask me before each step (earn points)", bn:"প্রতিটা ধাপের আগে আমাকে প্রশ্ন করো (পয়েন্ট জেতো)" },
+  level:{ en:"Level", bn:"লেভেল" },
+  negSide:{ en:"← negative", bn:"← নেগেটিভ (-)" }, posSide:{ en:"positive →", bn:"পজিটিভ (+) →" },
+  mixedOpt:{ en:n => `Mixed problems (all ${n} types, random order)`, bn:n => `সব রকম মিশিয়ে (${D(n)}টা ধরন, এলোমেলো ভাবে)` },
+  score:{ en:(r, t) => "★ Score: " + r + " / " + t, bn:(r, t) => "★ স্কোর: " + D(r) + " / " + D(t) },
+  chipPos:{ en:p => "Position: " + fmt(p), bn:p => "অবস্থান: " + fmt(p) },
+  chipFace:{ en:f => "Facing: " + (f === 1 ? "right →" : "← left"), bn:f => "মুখ: " + (f === 1 ? "ডান দিকে →" : "← বাঁ দিকে") },
+  chipMove:{ en:m => "Walking: " + (m === undefined ? "—" : m ? "forward" : "backward"), bn:m => "যাচ্ছে: " + (m === undefined ? "—" : m ? "সামনে" : "পেছনে") },
+  exprNum:{ en:"Number: ", bn:"সংখ্যা: " },
+  getReady:{ en:"Get ready…", bn:"তৈরি হও…" },
+  think:{ en:" Think! What will the robot do?", bn:" একটু ভাবো তো! রোবটটা এখন কী করবে?" },
+  part:{ en:(i, n) => "Part " + i + " of " + n + ": ", bn:(i, n) => "অংশ " + D(i) + "/" + D(n) + ": " },
+  resRight:{ en:"Right! ", bn:"একদম ঠিক! " }, resWrong:{ en:"Not quite. ", bn:"একটু ভুল হয়ে গেল। " },
+  pts:{ en:g => "+" + g + " point" + (g === 1 ? "" : "s") + ". ", bn:g => "+" + D(g) + " পয়েন্ট। " },
+  chose:{ en:x => " (you chose " + x + ")", bn:x => " (তুমি বেছেছিলে " + x + ")" },
+  ansNum:{ en:(a, p) => "Answer: " + fmt(a) + " → the robot stopped at " + fmt(p), bn:(a, p) => "উত্তর: " + fmt(a) + " → রোবট " + fmt(p) + "-এ থেমেছে" },
+  ans:{ en:p => "Answer: the robot stopped at " + fmt(p), bn:p => "উত্তর: রোবট " + fmt(p) + "-এ থেমেছে" },
+  ptsSum:{ en:(r, t) => "Points for this sum: " + r + " of " + t + ".", bn:(r, t) => "এই অঙ্কে তোমার পয়েন্ট: " + D(t) + "-এর মধ্যে " + D(r) + "।" },
+  lvUp:{ en:(l, n) => "Level up! Next: Level " + l + ", " + n + ".", bn:(l, n) => "লেভেল বাড়ল! পরের লেভেল: লেভেল " + D(l) + ", " + n + "।" },
+  lvUp2:{ en:"Level up! The next sums get a little harder.", bn:"লেভেল বাড়ল! এর পরের অঙ্কগুলো একটু কঠিন হবে।" },
+  done:{ en:p => "Done! The robot stopped at " + fmt(p) + ".", bn:p => "শেষ! রোবট " + fmt(p) + "-এ গিয়ে থেমেছে।" },
+  progress:{ en:(n, mixed, i, t) => "Question " + n + " · " + (mixed ? "Mixed problems" : "Level " + i + "/" + t),
+             bn:(n, mixed, i, t) => "প্রশ্ন " + D(n) + " · " + (mixed ? "সব রকম মিশিয়ে" : "লেভেল " + D(i) + "/" + D(t)) },
+  lvLabel:{ en:(l, n, p) => "Level " + l + ": " + n + "  \u00B7  " + p, bn:(l, n, p) => "লেভেল " + D(l) + ": " + n + "  \u00B7  " + p },
+  endTitle:{ en:"Game over!", bn:"খেলা শেষ!" },
+  again:{ en:"Play again", bn:"আবার খেলো" }, home2:{ en:"Back to home", bn:"হোমে ফিরে যাও" },
+  endNone:{ en:"No predictions were made. Keep the questions switched on to earn points.", bn:"তুমি তো কোনো অনুমানই করোনি। পয়েন্ট জিততে প্রশ্নগুলো চালু রেখো।" },
+  endPct:{ en:p => p + "% of your predictions were right. " + (p === 100 ? "Perfect!" : p >= 70 ? "Great work!" : "Keep practising!"),
+           bn:p => "তোমার অনুমানের " + D(p) + "% ঠিক হয়েছে। " + (p === 100 ? "দারুণ!" : p >= 70 ? "খুব ভালো কাজ!" : "আরো একটু প্র্যাকটিস করতে হবে!") }
+};
+
+function expected(q){
+  if (q.mode === "numbers") return q.a;
+  if (q.mode === "addsub") return q.op === "+" ? q.a + q.b : q.a - q.b;
+  return q.a * q.b;
+}
+
+/* ----- question builders ----- */
+const sideOpts = () => [["left", tr("optL")], ["right", tr("optR")]];
+const fwdBack = () => [["fwd", cap(tr("fwd"))], ["back", cap(tr("back"))]];
+const qDir = v => ({ text:tr("qDir"), opts:fwdBack(), answer:v > 0 ? "fwd" : "back", name:tr("nmWalking") });
+const qCount = (text, v, max, name) => ({
+  text:text, name:name, compact:true, answer:String(Math.abs(v)),
+  opts:Array.from({ length:max + 1 }, (_, i) => [String(i), D(i)])
+});
+const qFace = left => ({ text:tr("qFace"), opts:sideOpts(), answer:left ? "left" : "right", name:tr("nmFacing") });
+
+function buildPhases(q){
+  const max = q.max || 12, P = [];
+  let pos = 0, f = 1;                       // f: 1 = facing right, -1 = facing left
+
+  // n leaps of the given size; fwd = forward, otherwise backward
+  function walk(n, fwd, size){
+    const out = [];
+    for (let k = 1; k <= n; k++){
+      const from = pos;
+      pos += f * (fwd ? 1 : -1) * size;
+      out.push({ kind:"move", fwd:fwd, units:size, from:from, pos:pos, facing:f, text:tr("step", k, n, fwd, size, f, pos) });
+    }
+    return out;
+  }
+  const turn = (nf, text) => { f = nf; return [{ kind:"turn", pos:pos, facing:f, text:text }]; };
+  const toRight = fwd => (f * (fwd ? 1 : -1)) === 1;
+  const side = fwd => fd(toRight(fwd) ? 1 : -1);
+  const moveQ = fwd => CONFIG.askMoveDirection ? [{ text:tr("qMove"), opts:sideOpts(), name:tr("nmMoving"), answer:toRight(fwd) ? "right" : "left" }] : [];
+
+  if (q.mode === "numbers"){
+    const a = q.a, n = Math.abs(a);
+    P.push({
+      hl:"a", intro:tr("nIntro", a),
+      qs: (a ? [qDir(a)] : []).concat([qCount(tr("qUnits"), a, max, tr("nmUnits"))]),
+      steps: walk(n, a > 0, 1),
+      done: a === 0 ? tr("nZero") : tr("walkDone", a, n) + (a < 0 ? tr("stillNeg") : "")
+    });
+  }
+
+  else if (q.mode === "addsub"){
+    const a = q.a, b = q.b, na = Math.abs(a), nb = Math.abs(b);
+    P.push({
+      hl:"a", intro:tr("a1Intro", a),
+      qs: (a ? [qDir(a)] : []).concat([qCount(tr("qUnits"), a, max, tr("nmUnits"))]),
+      steps: walk(na, a > 0, 1),
+      done: a === 0 ? tr("a1Zero") : tr("walkDone", a, na) + tr("still")
+    });
+    P.push({
+      hl:"op", intro:tr("a2Intro", a),
+      qs:[{ text:tr("qTurn"), opts:[["turn", tr("optTurn")], ["stay", tr("optStay")]], answer:q.op === "-" ? "turn" : "stay", name:tr("nmTurning") }],
+      steps: q.op === "-" ? turn(-1, tr("a2TurnStep")) : [],
+      done: q.op === "-" ? tr("a2Sub") : tr("a2Add")
+    });
+    P.push({
+      hl:"b", intro:tr("a3Intro", b, f),
+      qs: (b ? [qDir(b)] : []).concat([qCount(tr("qUnits"), b, max, tr("nmUnits"))], b ? moveQ(b > 0) : []),
+      steps: walk(nb, b > 0, 1),
+      done: b === 0 ? tr("a3Zero") : tr("sideDone", b, nb, f, side(b > 0), pos)
+    });
+  }
+
+  else { // multiplication
+    const a = q.a, b = q.b, size = Math.abs(a), cnt = Math.abs(b);
+    P.push({
+      hl:"a", intro:tr("m1Intro", a),
+      qs: (a ? [qFace(a < 0)] : []).concat([qCount(tr("qSize"), a, max, tr("nmSize"))]),
+      steps: a < 0 ? turn(-1, tr("m1Turn")) : [],
+      done: a === 0 ? tr("m1Zero") : tr("m1Done", a, size)
+    });
+    const moves = a !== 0 && b !== 0;
+    P.push({
+      hl:"b", intro:tr("m2Intro", b, f),
+      qs: (b ? [qDir(b)] : []).concat([qCount(tr("qSteps"), b, max, tr("nmSteps"))], moves ? moveQ(b > 0) : []),
+      steps: moves ? walk(cnt, b > 0, size) : [],
+      done: !moves ? tr("m2Zero") : tr("m2Done", b, cnt, size, f, side(b > 0), pos)
+    });
+  }
+  return { phases:P, answer:pos };
+}
+
+/* ----- Addition & Subtraction levels -----
+   T(sign of a, operation, sign of b, relation of |a| and |b|, label)
+   signs: "+" positive, "-" negative, "0" zero, "r" random (not zero)
+   op:    "+" or "-" or "r" (random)
+   rel:   "any", "ne" (different), "eq" (equal), "gt" (a > b), "lt" (a < b)
+   max:   biggest size of a and b at that level                           */
+const rint = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
+const T = (sa, op, sb, rel, pat, extra) => Object.assign({ sa:sa, op:op, sb:sb, rel:rel, pat:pat }, extra);
+const N = "−";
+const ADDSUB_LEVELS = [
+  { name:"Basic Addition", max:5, types:[
+    T("+","+","+","ne","(+a) + (+b)"),     T("-","+","-","ne","(" + N + "a) + (" + N + "b)"),
+    T("+","+","-","ne","(+a) + (" + N + "b)"), T("-","+","+","ne","(" + N + "a) + (+b)") ]},
+  { name:"Basic Subtraction", max:5, types:[
+    T("+","-","+","ne","(+a) " + N + " (+b)"),     T("-","-","-","ne","(" + N + "a) " + N + " (" + N + "b)"),
+    T("+","-","-","ne","(+a) " + N + " (" + N + "b)"), T("-","-","+","ne","(" + N + "a) " + N + " (+b)") ]},
+  { name:"Results Equal to Zero", max:6, types:[
+    T("+","+","-","eq","(+a) + (" + N + "a)"), T("-","+","+","eq","(" + N + "a) + (+a)"),
+    T("+","-","+","eq","(+a) " + N + " (+a)"), T("-","-","-","eq","(" + N + "a) " + N + " (" + N + "a)") ]},
+  { name:"Operations Involving Zero", max:6, types:[
+    T("0","+","+","any","0 + (+b)"), T("0","+","-","any","0 + (" + N + "b)"),
+    T("0","-","+","any","0 " + N + " (+b)"), T("0","-","-","any","0 " + N + " (" + N + "b)"),
+    T("+","+","0","any","(+a) + 0"), T("-","+","0","any","(" + N + "a) + 0"),
+    T("+","-","0","any","(+a) " + N + " 0"), T("-","-","0","any","(" + N + "a) " + N + " 0"),
+    T("0","+","0","any","0 + 0"), T("0","-","0","any","0 " + N + " 0") ]},
+  { name:"Varying Sizes and Crossing Zero", max:8, types:[
+    T("+","+","-","gt","(+a) + (" + N + "b), a > b"), T("+","+","-","lt","(+a) + (" + N + "b), a < b"),
+    T("-","+","+","gt","(" + N + "a) + (+b), a > b"), T("-","+","+","lt","(" + N + "a) + (+b), a < b"),
+    T("+","-","+","gt","(+a) " + N + " (+b), a > b"), T("+","-","+","lt","(+a) " + N + " (+b), a < b"),
+    T("-","-","-","gt","(" + N + "a) " + N + " (" + N + "b), a > b"), T("-","-","-","lt","(" + N + "a) " + N + " (" + N + "b), a < b") ]},
+  { name:"Mixed Practice", max:9, types:[
+    T("r","+","r","any","random addition"),
+    T("r","-","r","any","random subtraction"),
+    T("r","r","r","any","random, with a zero", { zero:true }),
+    T("r","r","r","eq","random, equal sizes"),
+    T("r","r","r","ne","random, different sizes"),
+    /* the problems of the Subtraction Rule Practice section: a \u2212 b, and the same sum changed to an addition */
+    T("+","-","+","any","(+a) " + N + " (+b)"),     T("-","-","+","any","(" + N + "a) " + N + " (+b)"),
+    T("+","-","-","any","(+a) " + N + " (" + N + "b)"), T("-","-","-","any","(" + N + "a) " + N + " (" + N + "b)"),
+    T("+","+","-","any","(+a) + (" + N + "b)"),     T("-","+","-","any","(" + N + "a) + (" + N + "b)"),
+    T("+","+","+","any","(+a) + (+b)"),             T("-","+","+","any","(" + N + "a) + (+b)") ]}
+];
+(function(){ let id = 0; ADDSUB_LEVELS.forEach(l => l.types.forEach(t => { t.id = ++id; })); })();   // question types 1..35
+
+function genAddSub(L, ti){
+  const lv = ADDSUB_LEVELS[L], t = lv.types[ti], max = lv.max;
+  let ma = rint(1, max), mb = rint(1, max);
+  if (t.rel === "eq") mb = ma;
+  else if (t.rel === "ne"){ while (mb === ma) mb = rint(1, max); }
+  else if (t.rel === "gt"){ mb = rint(1, max - 1); ma = rint(mb + 1, max); }
+  else if (t.rel === "lt"){ ma = rint(1, max - 1); mb = rint(ma + 1, max); }
+  const sgn = c => c === "+" ? 1 : c === "-" ? -1 : c === "0" ? 0 : (Math.random() < 0.5 ? 1 : -1);
+  let sa = sgn(t.sa), sb = sgn(t.sb);
+  if (t.zero){ if (Math.random() < 0.5) sa = 0; else sb = 0; }
+  return { a:sa * ma, b:sb * mb, op:t.op === "r" ? (Math.random() < 0.5 ? "+" : "-") : t.op };
+}
+
+function exprHTML(q, result){
+  const p = (id, t) => '<span class="part" id="' + id + '">' + t + '</span>';
+  if (q.mode === "numbers") return tr("exprNum") + p("pa", fmt(q.a));
+  const op = q.mode === "mul" ? "×" : (q.op === "+" ? "+" : MINUS);
+  const a = q.mode === "mul" ? par(q.a) : fmt(q.a);
+  return p("pa", a) + " " + p("pop", op) + " " + p("pb", par(q.b)) + " = " + (result === undefined ? "?" : "<b>" + fmt(result) + "</b>");
+}
+
+/*__UI__*/
+
+/* =====================================================================
+   PAGE CODE
+   ===================================================================== */
+const $ = id => document.getElementById(id);
+const MODES = {
+  numbers:{ n:"cNum", l:"lNum" },
+  addsub: { n:"cAdd", l:"lAdd" },
+  mul:    { n:"cMul", l:"lMul" },
+  subrule:{ n:"cRule", l:"lRule" }
+};
+
+const state = {
+  mode:null, q:null, phases:[], pi:0, pos:0, facing:1,
+  busy:false, started:false, token:0, revealed:false, credited:false, answer:0,
+  qCount:0, correct:{numbers:0, addsub:0, mul:0, subrule:0}, lastKey:{},
+  bank:{right:0, total:0}, cur:{right:0, total:0}, quizResolve:null,
+  lvl:0, lvCorrect:0, bag:[],
+  hops:[], R:CONFIG.minRange, W:600, unit:30, axisY:140
+};
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const quizOn = () => $("quizToggle").checked;
+
+/* ---------- robot picture ---------- */
+function robotHTML(w0, h0){
+  const w = w0 || CONFIG.robotWidth, h = h0 || CONFIG.robotHeight;
+  if (CONFIG.robotImage){
+    return '<img src="' + CONFIG.robotImage.replace(/"/g, "") + '" alt="robot" draggable="false" ' +
+           'style="width:' + w + 'px;height:' + h + 'px;object-fit:contain;display:block">';
+  }
+  // Built-in side-facing robot. Visor + eye = FRONT (right). Orange backpack = BACK (left).
+  return '<svg viewBox="0 0 100 120" width="' + w + '" height="' + h + '" xmlns="http://www.w3.org/2000/svg">' +
+    '<g class="limb l2"><rect x="44" y="82" width="10" height="28" rx="5" fill="#64748b"/><rect x="41" y="106" width="22" height="9" rx="4" fill="#334155"/></g>' +
+    '<g class="limb a2"><rect x="45" y="52" width="10" height="26" rx="5" fill="#94a3b8"/></g>' +
+    '<rect x="12" y="48" width="22" height="36" rx="7" fill="#f59e0b"/>' +
+    '<rect x="28" y="44" width="44" height="42" rx="10" fill="#3b82f6"/>' +
+    '<circle cx="58" cy="65" r="6" fill="#fde68a"/>' +
+    '<g class="limb l1"><rect x="54" y="82" width="10" height="28" rx="5" fill="#475569"/><rect x="51" y="106" width="22" height="9" rx="4" fill="#1e293b"/></g>' +
+    '<g class="limb a1"><rect x="45" y="52" width="10" height="26" rx="5" fill="#cbd5e1"/></g>' +
+    '<rect x="26" y="8" width="48" height="34" rx="12" fill="#cbd5e1"/>' +
+    '<rect x="46" y="15" width="36" height="19" rx="9.5" fill="#0f172a"/>' +
+    '<circle cx="70" cy="24.5" r="4.5" fill="#38bdf8"/>' +
+    '<line x1="40" y1="8" x2="40" y2="1" stroke="#475569" stroke-width="3"/><circle cx="40" cy="3" r="3.5" fill="#ef4444"/>' +
+    '</svg>';
+}
+
+/* ---------- number line drawing ---------- */
+function xOf(v){ return state.W / 2 + v * state.unit; }
+const HOP_MAX = 44;                                   // tallest leap, in pixels
+const hopH = w => Math.max(10, Math.min(HOP_MAX, w * 0.45));
+
+// Every leap stays on the line as a dashed arc + a thick bar on the axis that covers exactly its units.
+function drawHops(){
+  let h = '<defs><marker id="ahF" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2563eb"/></marker>' +
+          '<marker id="ahB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ea580c"/></marker></defs>';
+  const y = state.axisY + 2;
+  state.hops.forEach(p => {
+    const x1 = xOf(p.from), x2 = xOf(p.to), xm = (x1 + x2) / 2, w = Math.abs(x2 - x1), H = hopH(w);
+    const c = p.fwd ? "#2563eb" : "#ea580c";
+    h += `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${c}" stroke-width="7" stroke-linecap="round" opacity=".5"/>` +
+         `<path d="M${x1} ${y} Q${xm} ${y - 2 * H} ${x2} ${y}" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="7 5" marker-end="url(#${p.fwd ? "ahF" : "ahB"})"/>` +
+         `<circle cx="${x1}" cy="${y}" r="4" fill="#fff" stroke="${c}" stroke-width="2"/><circle cx="${x2}" cy="${y}" r="5" fill="${c}"/>`;
+    if (w >= 20) h += `<text x="${xm}" y="${y - H - 6}" text-anchor="middle" font-size="13" font-weight="800" fill="${c}" style="paint-order:stroke;stroke:#fff;stroke-width:4px">${w >= 56 ? u(p.size) : D(p.size)}</text>`;
+  });
+  $("trail").innerHTML = h;
+}
+
+function layout(){
+  const stage = $("stage");
+  state.W = stage.clientWidth;
+  state.axisY = Math.max(150, CONFIG.robotHeight + 28 + HOP_MAX);
+  stage.style.height = (state.axisY + 76) + "px";
+  $("trail").setAttribute("width", state.W);
+  $("trail").setAttribute("height", state.axisY + 76);
+  $("axis").style.top = state.axisY + "px";
+  const pad = Math.max(26, CONFIG.robotWidth / 2 + 6);
+  state.unit = (state.W - 2 * pad) / (2 * state.R);
+
+  const every = state.unit >= 26 ? 1 : state.unit >= 14 ? 2 : 5;
+  let html = "";
+  for (let v = -state.R; v <= state.R; v++){
+    const z = v === 0 ? " zero" : "";
+    const tickH = v === 0 ? 26 : 16;
+    html += '<div class="tick' + z + '" style="left:' + xOf(v) + 'px;top:' + (state.axisY - tickH / 2 + 2) + 'px"></div>';
+    if (v === 0 || v % every === 0){
+      html += '<div class="tlabel' + z + '" style="left:' + xOf(v) + 'px;top:' + (state.axisY + 18) + 'px">' + fmt(v) + '</div>';
+    }
+  }
+  $("ticks").innerHTML = html;
+
+  $("robot").style.top = (state.axisY - CONFIG.robotHeight + 4) + "px";
+  $("goal").style.top = (state.axisY + 14) + "px";
+  if (!$("goal").hidden) $("goal").style.left = xOf(state.answer) + "px";
+  drawHops();
+  placeRobot(state.pos, state.facing, true);
+}
+
+function flipScale(facing){
+  return facing * (CONFIG.robotImage && !CONFIG.imageFacesRight ? -1 : 1);
+}
+
+function placeRobot(pos, facing, instant){
+  const r = $("robot"), fl = $("flip");
+  if (instant){ r.style.transition = "none"; fl.style.transition = "none"; }
+  r.style.left = (xOf(pos) - CONFIG.robotWidth / 2) + "px";
+  fl.style.transform = "scaleX(" + flipScale(facing) + ")";
+  if (instant){ void r.offsetWidth; r.style.transition = ""; fl.style.transition = ""; }
+}
+
+function updateChips(moving){
+  $("chipPos").textContent = tr("chipPos", state.pos);
+  $("chipFace").textContent = tr("chipFace", state.facing);
+  $("chipMove").textContent = tr("chipMove", moving);
+}
+
+// Score = points kept from earlier sums (bank) + points for the sum on screen (cur).
+// Reset clears only the current sum's points, so a sum cannot be replayed to earn extra.
+function updateScore(){
+  $("scoreBox").textContent = tr("score", state.bank.right + state.cur.right, state.bank.total + state.cur.total);
+}
+function commitQuestion(){
+  state.bank.right += state.cur.right;
+  state.bank.total += state.cur.total;
+  state.cur = { right:0, total:0 };
+}
+
+function highlight(id){
+  document.querySelectorAll("#expr .part").forEach(p => p.classList.remove("hl"));
+  const e = $("expr");
+  if (id && $("p" + id)){ $("p" + id).classList.add("hl"); e.classList.add("focus"); }
+  else e.classList.remove("focus");
+}
+
+/* ---------- questions ---------- */
+const randInt = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const randNum = (max, zero) => { let v; do { v = randInt(-max, max); } while (!zero && v === 0); return v; };
+function levelOf(mode){
+  return Math.min(CONFIG.ranges[mode].length - 1, Math.floor(state.correct[mode] / CONFIG.correctPerLevel));
+}
+function shuffle(arr){
+  for (let i = arr.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; }
+  return arr;
+}
+function levelInfo(mode){
+  if (mode === "addsub") return { index:state.lvl, total:ADDSUB_LEVELS.length };
+  return { index:levelOf(mode), total:CONFIG.ranges[mode].length };
+}
+// The last choice in the Level menu: every question type from every level, in random order.
+const MIXED = ADDSUB_LEVELS.length;
+// Add/Sub: go through every question type of the level (shuffled), then start again.
+// In Mixed mode the shuffled list holds the types of all levels, so each type comes once before any repeats.
+function makeAddSubQuestion(){
+  let q, key, tries = 0;
+  do {
+    if (!state.bag.length){
+      const levels = state.lvl === MIXED ? ADDSUB_LEVELS.map((_, i) => i) : [state.lvl];
+      const all = [];
+      levels.forEach(L => ADDSUB_LEVELS[L].types.forEach((_, ti) => all.push([L, ti])));
+      state.bag = shuffle(all);
+    }
+    const pick = state.bag.pop(), L = pick[0], ti = pick[1], lv = ADDSUB_LEVELS[L], g = genAddSub(L, ti);
+    q = { mode:"addsub", L:L, max:lv.max, a:g.a, op:g.op, b:g.b, tid:lv.types[ti].id, pat:lv.types[ti].pat };
+    key = [q.a, q.op, q.b].join("|");
+    tries++;
+  } while (key === state.lastKey.addsub && tries < 30);
+  state.lastKey.addsub = key;
+  return q;
+}
+
+function makeQuestion(mode){
+  if (mode === "addsub") return makeAddSubQuestion();
+  const L = levelOf(mode), max = CONFIG.ranges[mode][L], zero = L >= CONFIG.zeroFromLevel;
+  let q, key, tries = 0;
+  do {
+    q = { mode:mode, L:L, max:max, a:randNum(max, zero) };
+    if (mode !== "numbers") q.b = randNum(max, zero);
+    if (mode === "addsub") q.op = Math.random() < 0.5 ? "+" : "-";
+    key = [q.a, q.op, q.b].join("|");
+    tries++;
+  } while (key === state.lastKey[mode] && tries < 60);
+  state.lastKey[mode] = key;
+  return q;
+}
+
+function loadQuestion(){
+  if (state.mode === "subrule") return ruleLoad();
+  commitQuestion();
+  state.token++;
+  state.busy = false; state.started = false;
+  const q = makeQuestion(state.mode);
+  state.q = q;
+  state.qCount++;
+  const built = buildPhases(q);
+  state.phases = built.phases;
+  state.answer = built.answer;
+  if (state.answer !== expected(q)) console.error("Math mismatch", q, state.answer, expected(q));
+
+  // the visible range must hold every position on the walk
+  let maxAbs = 0;
+  state.phases.forEach(p => p.steps.forEach(s => { maxAbs = Math.max(maxAbs, Math.abs(s.pos), Math.abs(s.from === undefined ? 0 : s.from)); }));
+  state.R = Math.max(CONFIG.minRange, maxAbs + 1);
+
+  $("qLabel").textContent = state.mode === "addsub" ? tr("lvLabel", q.L + 1, lvName(q.L), patT(q.pat)) : tr(MODES[state.mode].l);
+  $("answerBox").hidden = true;
+  state.credited = false;
+  updateProgress();
+  resetRun();
+  startRun();                      // a new problem starts by itself
+}
+
+function updateProgress(){
+  const li = levelInfo(state.mode);
+  $("progress").textContent = tr("progress", state.qCount, state.mode === "addsub" && state.lvl === MIXED, li.index + 1, li.total);
+}
+
+/* ---------- running the parts ---------- */
+function clearQuiz(){
+  if (state.quizResolve){ const r = state.quizResolve; state.quizResolve = null; r(null); }
+  $("quiz").hidden = true; $("quiz").innerHTML = "";
+  $("stepFeedback").hidden = true; $("stepFeedback").textContent = "";
+}
+
+function resetRun(){
+  state.token++;
+  state.busy = false; state.started = false;
+  state.pi = 0; state.pos = 0; state.facing = 1;
+  state.revealed = false;
+  state.hops = [];
+  state.cur = { right:0, total:0 };
+  if ($("bob").getAnimations) $("bob").getAnimations().forEach(a => a.cancel());
+  $("robot").classList.remove("walking", "back");
+  $("goal").hidden = true;
+  $("answerBox").hidden = true;
+  $("expr").innerHTML = exprHTML(state.q);
+  highlight(null);
+  clearQuiz();
+  layout();
+  updateChips();
+  updateScore();
+  $("instruction").textContent = tr("getReady");
+  setButtons();
+}
+
+// Next is available once the problem is finished
+function setButtons(){ $("nextBtn").disabled = !state.revealed; }
+
+// One leap = the robot jumps along an arc that covers exactly s.units units, and the arc stays on the line.
+async function applyStep(s){
+  const tok = state.token;
+  $("instruction").textContent = s.text;
+  const robot = $("robot");
+  if (s.kind === "move"){
+    const w = Math.abs(xOf(s.pos) - xOf(s.from)), H = hopH(w);
+    const ms = Math.min(CONFIG.maxHopMs, CONFIG.hopMs + CONFIG.hopMsPerUnit * s.units);
+    state.hops.push({ from:s.from, to:s.pos, size:s.units, fwd:s.fwd });
+    drawHops();
+    state.pos = s.pos;
+    updateChips(s.fwd);
+    robot.style.transition = "left " + ms + "ms linear";
+    robot.style.left = (xOf(s.pos) - CONFIG.robotWidth / 2) + "px";
+    const frames = [];
+    for (let i = 0; i <= 12; i++){ const t = i / 12; frames.push({ transform:"translateY(" + (-4 * H * t * (1 - t)) + "px)" }); }
+    $("bob").animate(frames, { duration:ms, easing:"linear" });
+    await sleep(ms + CONFIG.hopPauseMs);
+    if (tok !== state.token) return false;
+    updateChips();
+  } else {
+    const ms = CONFIG.turnMs;
+    $("flip").style.transition = "transform " + ms + "ms ease-in-out";
+    state.facing = s.facing;
+    $("flip").style.transform = "scaleX(" + flipScale(s.facing) + ")";
+    updateChips();
+    await sleep(ms + 100);
+    if (tok !== state.token) return false;
+  }
+  return true;
+}
+
+function askQuiz(qs){
+  return new Promise(resolve => {
+    const box = $("quiz");
+    let html = "";
+    qs.forEach((q, i) => {
+      html += '<div class="qrow" data-i="' + i + '"><div class="qt">' + q.text + '</div><div class="opts">' +
+        q.opts.map(o => '<button class="opt' + (q.compact ? ' small' : '') + '" data-v="' + o[0] + '">' + o[1] + '</button>').join("") +
+        '</div></div>';
+    });
+    box.innerHTML = html;
+    box.hidden = false;
+    const picks = [];
+    state.quizResolve = resolve;
+    box.querySelectorAll(".qrow").forEach(row => {
+      const i = +row.dataset.i;
+      row.querySelectorAll(".opt").forEach(b => b.addEventListener("click", () => {
+        if (picks[i] !== undefined) return;
+        picks[i] = b.dataset.v;
+        row.querySelectorAll(".opt").forEach(x => { x.disabled = true; });
+        b.classList.add("picked");
+        if (qs.every((_, j) => picks[j] !== undefined)){ state.quizResolve = null; resolve(picks); }
+      }));
+    });
+  });
+}
+
+function showResult(qs, picks){
+  $("quiz").querySelectorAll(".qrow").forEach(row => {
+    const i = +row.dataset.i;
+    row.querySelectorAll(".opt").forEach(b => {
+      b.classList.remove("picked");
+      if (b.dataset.v === qs[i].answer) b.classList.add("right");
+      else if (b.dataset.v === picks[i]) b.classList.add("wrong");
+    });
+  });
+  let gained = 0;
+  const parts = qs.map((q, i) => {
+    const ok = picks[i] === q.answer;
+    if (ok) gained++;
+    return (ok ? "✓ " : "✗ ") + q.name + ": " + wd(q.answer) + (ok ? "" : tr("chose", wd(picks[i])));
+  });
+  state.cur.right += gained;            // +1 for each right prediction, 0 for a wrong one
+  state.cur.total += qs.length;
+  const all = gained === qs.length;
+  const fb = $("stepFeedback");
+  fb.className = all ? "good" : "bad";
+  fb.textContent = (all ? tr("resRight") : tr("resWrong")) + tr("pts", gained) + parts.join(" · ");
+  fb.hidden = false;
+  updateScore();
+}
+
+// One part: highlight, (ask), explain, hop. Returns false if the run was cancelled.
+async function runPhase(){
+  state.busy = true;
+  const tok = state.token;
+  const ph = state.phases[state.pi];
+  const tag = state.phases.length > 1 ? tr("part", state.pi + 1, state.phases.length) : "";
+  clearQuiz();
+  highlight(ph.hl);
+
+  if (quizOn() && ph.qs.length){
+    $("instruction").textContent = tag + ph.intro + tr("think");
+    const picks = await askQuiz(ph.qs);
+    if (!picks || tok !== state.token) return false;
+    showResult(ph.qs, picks);
+    await sleep(CONFIG.afterAnswerMs);
+  } else {
+    $("instruction").textContent = tag + ph.intro + " " + ph.done;
+    await sleep(CONFIG.explainMs);
+  }
+  if (tok !== state.token) return false;
+
+  for (let i = 0; i < ph.steps.length; i++){
+    const ok = await applyStep(ph.steps[i]);
+    if (!ok || tok !== state.token) return false;
+  }
+
+  $("instruction").textContent = ph.done;
+  state.pi++;
+  state.busy = false;
+  if (state.pi >= state.phases.length) finish(ph.done);
+  return true;
+}
+
+// The whole problem runs by itself, part after part.
+async function runAll(){
+  const tok = state.token;
+  await sleep(CONFIG.startDelayMs);
+  while (tok === state.token && state.pi < state.phases.length){
+    if (!(await runPhase())) return;
+    if (state.pi < state.phases.length) await sleep(CONFIG.partPauseMs);
+  }
+}
+function startRun(){ if (state.started) return; state.started = true; runAll(); }
+
+// A sum where every prediction was right counts towards the next level (once per sum).
+function creditQuestion(){
+  if (state.credited || state.cur.total === 0 || state.cur.right !== state.cur.total) return "";
+  state.credited = true;
+  const m = state.mode;
+  state.correct[m]++;
+  if (m === "addsub"){
+    state.lvCorrect++;
+    if (state.lvCorrect >= CONFIG.addsubCorrectPerLevel && state.lvl < ADDSUB_LEVELS.length - 1){
+      state.lvl++; state.lvCorrect = 0; state.bag = [];
+      $("levelSel").value = String(state.lvl);
+      return "<br>" + tr("lvUp", state.lvl + 1, lvName(state.lvl));
+    }
+  } else if (state.correct[m] % CONFIG.correctPerLevel === 0 && state.correct[m] / CONFIG.correctPerLevel <= CONFIG.ranges[m].length - 1){
+    return "<br>" + tr("lvUp2");
+  }
+  return "";
+}
+
+function finish(lastText){
+  state.revealed = true;
+  highlight(null);
+  $("expr").innerHTML = exprHTML(state.q, state.answer);
+  const g = $("goal");
+  g.textContent = fmt(state.answer);
+  g.style.left = xOf(state.answer) + "px";
+  g.hidden = false;
+  const q = state.q, box = $("answerBox");
+  box.innerHTML = "<b>" + (q.mode === "numbers" ? tr("ansNum", q.a, state.answer) : tr("ans", state.answer)) + "</b>";
+  if (quizOn() && state.cur.total > 0){
+    box.innerHTML += "<br>" + tr("ptsSum", state.cur.right, state.cur.total);
+    box.innerHTML += creditQuestion();
+  }
+  box.hidden = false;
+  $("instruction").textContent = (lastText ? lastText + " " : "") + tr("done", state.answer);
+  setButtons();
+}
+
+/* =====================================================================
+   SUBTRACTION RULE PRACTICE  (two sums side by side)
+   Left sum :  a − b        (robot turns at the minus sign, then walks b)
+   Right sum:  a + (−b)     (robot never turns, walks the opposite of b)
+   Both robots end at the same place. Then the child answers 5 questions.
+   ===================================================================== */
+const RULE = { rw:48, rh:58, hop:30 };
+const rs = {};
+const sideKeys = ["L", "R"];
+const rx = (r, v) => r.W / 2 + v * r.unit;
+
+function buildRuleStages(){
+  sideKeys.forEach(k => {
+    const col = $("rcol" + k);
+    col.innerHTML =
+      '<div class="question"><div class="rtag">' + tr(k === "L" ? "lLeft" : "lRight") + '</div><div class="rexpr"></div></div>' +
+      '<div class="stage rstage"><div class="axis"></div><div class="rticks"></div><svg class="rtrail" aria-hidden="true"></svg>' +
+      '<div class="rgoal" hidden></div><div class="rrobot"><div class="rbob"><div class="rflip"></div></div></div>' +
+      '<span class="side" style="left:10px">' + tr("negSide") + '</span><span class="side" style="right:10px">' + tr("posSide") + '</span></div>';
+    const f = s => col.querySelector(s);
+    rs[k] = { st:f(".rstage"), expr:f(".rexpr"), axis:f(".axis"), ticks:f(".rticks"), trail:f(".rtrail"), goal:f(".rgoal"),
+              robot:f(".rrobot"), bob:f(".rbob"), flip:f(".rflip"), pos:0, facing:1, hops:[], W:300, unit:20, axisY:108 };
+    rs[k].flip.innerHTML = robotHTML(RULE.rw, RULE.rh);
+  });
+}
+
+// The expression of one side, with signs written out: (+5) − (+3)   or   (+5) + (−3)
+function ruleExpr(k, q, result){
+  const p = (id, t, c) => '<span class="part ' + (c || "") + '" id="r' + k + id + '">' + t + '</span>';
+  const op = k === "L" ? MINUS : "+", b = k === "L" ? q.b : -q.b;
+  return p("a", pn(q.a)) + " " + p("op", op, "chg") + " " + p("b", pn(b), "chg") + " = " + (result === undefined ? "?" : "<b>" + fmt(result) + "</b>");
+}
+
+// The robot's steps for one side: 1-unit hops and (left side only) one turn.
+function ruleSteps(q, side){
+  const out = []; let pos = 0, f = 1;
+  const walk = (n, fwd) => {
+    for (let i = 0; i < n; i++){
+      const from = pos; pos += f * (fwd ? 1 : -1);
+      out.push({ kind:"move", fwd:fwd, from:from, pos:pos, facing:f });
+    }
+  };
+  walk(Math.abs(q.a), q.a > 0);
+  if (side === "L"){ f = -1; out.push({ kind:"turn", pos:pos, facing:f }); walk(Math.abs(q.b), q.b > 0); }
+  else { const o = -q.b; walk(Math.abs(o), o > 0); }
+  return { steps:out, end:pos };
+}
+
+function ruleDrawHops(k){
+  const r = rs[k], y = r.axisY + 2;
+  let h = '<defs><marker id="rF' + k + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2563eb"/></marker>' +
+          '<marker id="rB' + k + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ea580c"/></marker></defs>';
+  r.hops.forEach(p => {
+    const x1 = rx(r, p.from), x2 = rx(r, p.to), xm = (x1 + x2) / 2, w = Math.abs(x2 - x1), H = Math.max(8, Math.min(RULE.hop, w * 0.45));
+    const c = p.fwd ? "#2563eb" : "#ea580c";
+    h += '<line x1="' + x1 + '" y1="' + y + '" x2="' + x2 + '" y2="' + y + '" stroke="' + c + '" stroke-width="7" stroke-linecap="round" opacity=".5"/>' +
+         '<path d="M' + x1 + ' ' + y + ' Q' + xm + ' ' + (y - 2 * H) + ' ' + x2 + ' ' + y + '" fill="none" stroke="' + c + '" stroke-width="3" stroke-dasharray="7 5" marker-end="url(#' + (p.fwd ? "rF" : "rB") + k + ')"/>' +
+         '<circle cx="' + x1 + '" cy="' + y + '" r="4" fill="#fff" stroke="' + c + '" stroke-width="2"/><circle cx="' + x2 + '" cy="' + y + '" r="5" fill="' + c + '"/>';
+  });
+  r.trail.innerHTML = h;
+}
+
+function placeRule(r, pos, facing, instant){
+  if (instant){ r.robot.style.transition = "none"; r.flip.style.transition = "none"; }
+  r.robot.style.left = (rx(r, pos) - RULE.rw / 2) + "px";
+  r.flip.style.transform = "scaleX(" + flipScale(facing) + ")";
+  if (instant){ void r.robot.offsetWidth; r.robot.style.transition = ""; r.flip.style.transition = ""; }
+}
+
+function ruleLayout(){
+  sideKeys.forEach(k => {
+    const r = rs[k];
+    r.W = r.st.clientWidth;
+    r.axisY = RULE.rh + 20 + RULE.hop;
+    r.st.style.height = (r.axisY + 64) + "px";
+    r.trail.setAttribute("width", r.W);
+    r.trail.setAttribute("height", r.axisY + 64);
+    r.axis.style.top = r.axisY + "px";
+    const pad = Math.max(22, RULE.rw / 2 + 6);
+    r.unit = (r.W - 2 * pad) / (2 * state.R);
+    const every = r.unit >= 26 ? 1 : r.unit >= 14 ? 2 : 5;
+    let html = "";
+    for (let v = -state.R; v <= state.R; v++){
+      const z = v === 0 ? " zero" : "", tickH = v === 0 ? 26 : 16;
+      html += '<div class="tick' + z + '" style="left:' + rx(r, v) + 'px;top:' + (r.axisY - tickH / 2 + 2) + 'px"></div>';
+      if (v === 0 || v % every === 0) html += '<div class="tlabel' + z + '" style="left:' + rx(r, v) + 'px;top:' + (r.axisY + 18) + 'px">' + fmt(v) + '</div>';
+    }
+    r.ticks.innerHTML = html;
+    r.robot.style.top = (r.axisY - RULE.rh + 4) + "px";
+    r.goal.style.top = (r.axisY + 14) + "px";
+    if (!r.goal.hidden) r.goal.style.left = rx(r, state.answer) + "px";
+    ruleDrawHops(k);
+    placeRule(r, r.pos, r.facing, true);
+  });
+}
+
+function ruleLoad(){
+  commitQuestion();
+  state.token++; state.busy = false; state.started = false;
+  const L = levelOf("subrule"), max = CONFIG.ranges.subrule[L];
+  let q, key, tries = 0;
+  do {
+    q = { mode:"subrule", L:L, max:max, a:randNum(max, false), b:randNum(max, false) };
+    key = q.a + "|" + q.b; tries++;
+  } while (key === state.lastKey.subrule && tries < 60);
+  state.lastKey.subrule = key;
+  state.q = q;
+  state.qCount++;
+  const sl = ruleSteps(q, "L"), sr = ruleSteps(q, "R");
+  state.rule = { L:sl, R:sr };
+  state.answer = sl.end;
+  if (sl.end !== q.a - q.b || sr.end !== q.a - q.b) console.error("Math mismatch", q, sl.end, sr.end);
+  let maxAbs = Math.abs(state.answer);
+  [sl, sr].forEach(x => x.steps.forEach(s => { maxAbs = Math.max(maxAbs, Math.abs(s.pos), Math.abs(s.from === undefined ? 0 : s.from)); }));
+  state.R = Math.max(CONFIG.minRange, maxAbs + 1);
+  $("qLabel").textContent = tr(MODES.subrule.l);
+  state.credited = false;
+  updateProgress();
+  ruleReset();
+  ruleStart();
+}
+
+function ruleReset(){
+  state.token++; state.busy = false; state.started = false;
+  state.revealed = false;
+  state.cur = { right:0, total:0 };
+  clearQuiz();
+  sideKeys.forEach(k => {
+    const r = rs[k];
+    r.pos = 0; r.facing = 1; r.hops = [];
+    r.goal.hidden = true;
+    r.expr.classList.remove("focus");
+    r.expr.innerHTML = ruleExpr(k, state.q);
+    r.bob.getAnimations().forEach(a => a.cancel());
+  });
+  $("answerBox").hidden = true;
+  ruleLayout();
+  updateScore();
+  $("instruction").textContent = tr("getReady");
+  setButtons();
+}
+
+async function ruleStep(k, s){
+  const r = rs[k];
+  if (s.kind === "move"){
+    const ms = CONFIG.ruleHopMs, w = Math.abs(rx(r, s.pos) - rx(r, s.from)), H = Math.max(8, Math.min(RULE.hop, w * 0.45));
+    r.hops.push({ from:s.from, to:s.pos, fwd:s.fwd });
+    ruleDrawHops(k);
+    r.pos = s.pos;
+    r.robot.style.transition = "left " + ms + "ms linear";
+    r.robot.style.left = (rx(r, s.pos) - RULE.rw / 2) + "px";
+    const frames = [];
+    for (let i = 0; i <= 12; i++){ const t = i / 12; frames.push({ transform:"translateY(" + (-4 * H * t * (1 - t)) + "px)" }); }
+    r.bob.animate(frames, { duration:ms, easing:"linear" });
+    await sleep(ms + CONFIG.rulePauseMs);
+  } else {
+    r.flip.style.transition = "transform " + CONFIG.turnMs + "ms ease-in-out";
+    r.facing = s.facing;
+    r.flip.style.transform = "scaleX(" + flipScale(s.facing) + ")";
+    await sleep(CONFIG.turnMs + 100);
+  }
+}
+
+async function ruleRunSide(k, tok){
+  for (const s of state.rule[k].steps){
+    if (tok !== state.token) return false;
+    await ruleStep(k, s);
+  }
+  return tok === state.token;
+}
+
+function ruleQs(){
+  const sign = [["minus", "−"], ["plus", "+"]], yn = [["yes", tr("yes")], ["no", tr("no")]];
+  return [
+    { text:tr("qRL"), name:tr("nmRL"), opts:sign, compact:true, answer:"minus" },
+    { text:tr("qRR"), name:tr("nmRR"), opts:sign, compact:true, answer:"plus" },
+    { text:tr("qRFirst"), name:tr("nmRFirst"), opts:yn, answer:"yes" },
+    { text:tr("qRSecond"), name:tr("nmRSecond"), opts:yn, answer:"no" },
+    { text:tr("qRAns"), name:tr("nmRAns"), opts:yn, answer:"yes" }
+  ];
+}
+
+function ruleStart(){ if (state.started) return; state.started = true; ruleRun(); }
+
+async function ruleRun(){
+  state.busy = true;
+  const tok = state.token, on = quizOn(), q = state.q;
+  const tag = i => on ? tr("part", i, 2) : "";
+  await sleep(CONFIG.startDelayMs);
+  if (tok !== state.token) return;
+  $("instruction").textContent = tag(1) + tr("rIntro");
+  await sleep(CONFIG.partPauseMs);
+  if (tok !== state.token) return;
+
+  // left side first, then the right side
+  $("instruction").textContent = tag(1) + tr("rLeftGo");
+  if (!(await ruleRunSide("L", tok)) || tok !== state.token) return;
+  await sleep(CONFIG.partPauseMs);
+  if (tok !== state.token) return;
+  $("instruction").textContent = tag(1) + tr("rRightGo");
+  if (!(await ruleRunSide("R", tok)) || tok !== state.token) return;
+
+  // show the answers on both lines
+  sideKeys.forEach(k => {
+    const r = rs[k];
+    r.expr.innerHTML = ruleExpr(k, q, state.answer);
+    r.goal.textContent = fmt(state.answer);
+    r.goal.style.left = rx(r, state.answer) + "px";
+    r.goal.hidden = false;
+  });
+  $("instruction").textContent = tag(2) + tr("rLook");
+  await sleep(CONFIG.afterAnswerMs);
+  if (tok !== state.token) return;
+
+  if (on){
+    const qs = ruleQs();
+    const picks = await askQuiz(qs);
+    if (!picks || tok !== state.token) return;
+    showResult(qs, picks);
+    await sleep(CONFIG.afterAnswerMs);
+    if (tok !== state.token) return;
+  }
+  ruleFinish();
+}
+
+function ruleFinish(){
+  state.busy = false;
+  state.revealed = true;
+  const q = state.q;
+  sideKeys.forEach(k => {      // highlight what changed: the sign in the middle and the second number
+    rs[k].expr.classList.add("focus");
+    rs[k].expr.querySelectorAll(".chg").forEach(p => p.classList.add("hl"));
+  });
+  const box = $("answerBox");
+  box.innerHTML = "<b>" + tr("rAns", state.answer) + "</b><br>" + tr("rOpp", q.b);
+  if (quizOn() && state.cur.total > 0){
+    box.innerHTML += "<br>" + tr("ptsSum", state.cur.right, state.cur.total);
+    box.innerHTML += creditQuestion();
+  }
+  box.hidden = false;
+  $("instruction").textContent = tr("rConclude");
+  setButtons();
+}
+
+/* ---------- end of game ---------- */
+function endGame(){
+  state.token++; state.busy = false;
+  clearQuiz();
+  commitQuestion();
+  updateScore();
+  const r = state.bank.right, t = state.bank.total;
+  $("endScore").textContent = D(r) + " / " + D(t);
+  const pct = t ? Math.round(100 * r / t) : 0;
+  $("endMsg").textContent = t === 0 ? tr("endNone") : tr("endPct", pct);
+  $("endScreen").hidden = false;
+}
+
+/* ---------- language ---------- */
+function buildLevelOptions(){
+  const sel = $("levelSel"), keep = String(state.lvl);
+  sel.innerHTML = "";
+  ADDSUB_LEVELS.forEach((l, i) => {
+    const o = document.createElement("option");
+    o.value = String(i); o.textContent = D(i + 1) + ". " + lvName(i);
+    sel.appendChild(o);
+  });
+  const o = document.createElement("option");
+  o.value = String(MIXED); o.textContent = tr("mixedOpt", ADDSUB_LEVELS.reduce((s, l) => s + l.types.length, 0));
+  sel.appendChild(o);
+  sel.value = keep;
+}
+function applyLang(){
+  document.documentElement.lang = LANG;
+  document.title = tr("title");
+  document.querySelectorAll("[data-t]").forEach(el => { el.textContent = tr(el.dataset.t); });
+  document.querySelectorAll(".lang button").forEach(b => b.classList.toggle("on", b.dataset.lang === LANG));
+  buildLevelOptions();
+  updateScore();
+}
+
+/* ---------- wiring ---------- */
+function openMode(mode){
+  state.mode = mode;
+  state.qCount = 0;
+  state.bank = { right:0, total:0 };
+  state.cur = { right:0, total:0 };
+  $("home").hidden = true;
+  $("learn").hidden = false;
+  $("topic").textContent = tr(MODES[mode].n);
+  $("levelBox").hidden = mode !== "addsub";
+  $("levelSel").value = String(state.lvl);
+  const rule = mode === "subrule";
+  $("ruleArea").hidden = !rule;
+  $("expr").hidden = rule; $("stage").hidden = rule; $("chips").hidden = rule;
+  if (rule) buildRuleStages();
+  $("flip").innerHTML = robotHTML();
+  loadQuestion();
+}
+function goHome(){
+  state.token++; state.busy = false; state.started = false;
+  $("endScreen").hidden = true;
+  clearQuiz();
+  $("learn").hidden = true;
+  $("home").hidden = false;
+}
+
+document.querySelectorAll(".card").forEach(c => c.addEventListener("click", () => openMode(c.dataset.mode)));
+document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => {
+  LANG = b.dataset.lang;
+  try { localStorage.setItem("nle-lang", LANG); } catch (e) {}
+  applyLang();
+}));
+$("backBtn").addEventListener("click", goHome);
+$("nextBtn").addEventListener("click", () => { if (state.revealed) loadQuestion(); });
+function restart(){
+  if (state.mode === "subrule"){ ruleReset(); ruleStart(); }
+  else { resetRun(); startRun(); }
+}
+$("resetBtn").addEventListener("click", restart);
+$("quizToggle").addEventListener("change", restart);
+$("levelSel").addEventListener("change", () => {
+  state.lvl = parseInt($("levelSel").value, 10) || 0;
+  state.lvCorrect = 0; state.bag = []; state.qCount = 0;
+  loadQuestion();
+});
+$("endBtn").addEventListener("click", endGame);
+$("againBtn").addEventListener("click", () => { $("endScreen").hidden = true; openMode(state.mode); });
+$("homeBtn2").addEventListener("click", goHome);
+window.addEventListener("resize", () => { if (!$("learn").hidden) { if (state.mode === "subrule") ruleLayout(); else layout(); } });
+
+try { const l = localStorage.getItem("nle-lang"); if (l === "bn" || l === "en") LANG = l; } catch (e) {}
+applyLang();
+</script>
+</body>
+</html>

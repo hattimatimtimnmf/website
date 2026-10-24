@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Algebra Tiles</title>
+<style>
+:root{--bg:#f4f6f8;--panel:#fff;--ink:#1d2430;--mute:#6a7686;--line:#cfd6df;--blue:#2563eb;--red:#dc2626;--green:#16a34a;--sel:#f59e0b}
+@media (prefers-color-scheme:dark){:root{--bg:#13161b;--panel:#1c2027;--ink:#e8ebef;--mute:#98a2b0;--line:#384050;--blue:#3b82f6;--red:#ef4444;--green:#22c55e}}
+*{box-sizing:border-box}
+body{margin:0 auto;max-width:1000px;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-user-select:none;user-select:none}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px}
+#top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px}
+#eq{font-size:clamp(26px,5vw,40px);font-weight:600;letter-spacing:.02em;margin:0 auto}
+button{font:inherit;font-size:14px;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+button:hover:not(:disabled){border-color:var(--mute)}
+button:disabled{opacity:.45;cursor:default}
+button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+#tray{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:12px 18px}
+#tray .hint{flex:1 1 220px;font-size:13px;color:var(--mute);line-height:1.4}
+#board{position:relative;height:400px;overflow:hidden;touch-action:none}
+#board::before{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:2px dashed var(--line)}
+#sign{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:120px;font-weight:700;line-height:1;pointer-events:none;color:var(--red);text-shadow:0 0 28px color-mix(in srgb,var(--red) 55%,transparent);transition:color .25s,text-shadow .25s,font-size .25s}
+#sign.ok{color:var(--green);text-shadow:0 0 28px color-mix(in srgb,var(--green) 55%,transparent)}
+.tile{position:absolute;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;border-radius:6px;cursor:grab;touch-action:none;box-shadow:inset 0 0 0 2px rgba(255,255,255,.28),0 1px 3px rgba(0,0,0,.35);transition:left .12s,top .12s}
+.tile.pos{background:var(--blue)}
+.tile.neg{background:var(--red)}
+.tile.pal{position:relative;cursor:pointer;transition:transform .08s}
+.tile.pal:active{transform:scale(.92)}
+.tile.pal:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.tile.sel{outline:3px solid var(--sel);outline-offset:1px}
+.tile.drag{z-index:10;cursor:grabbing;transition:none;box-shadow:0 6px 14px rgba(0,0,0,.35)}
+.half{position:absolute;top:0;bottom:0;pointer-events:none;transition:background .2s,box-shadow .2s}
+#hL{left:0;right:calc(50% + 46px)}
+#hR{left:calc(50% + 46px);right:0}
+.half.on{background:color-mix(in srgb,var(--blue) 8%,transparent);box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--blue) 45%,transparent)}
+.half.full{background:color-mix(in srgb,var(--red) 14%,transparent)}
+.seg{display:flex}
+.seg button{border-radius:0}
+.seg button:first-child{border-radius:8px 0 0 8px}
+.seg button:last-child{border-radius:0 8px 8px 0;margin-left:-1px}
+.seg button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.marq{position:absolute;border:1px dashed var(--sel);background:rgba(245,158,11,.14);pointer-events:none}
+#bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:14px;color:var(--mute)}
+#mine{margin-left:auto}
+</style>
+</head>
+<body>
+<div id="top" class="panel">
+  <div id="eq" aria-live="polite"></div>
+  <button id="next">Next equation</button>
+</div>
+<div id="tray" class="panel">
+  <div class="seg" role="group" aria-label="Add tiles to"><button id="sL">Left side</button><button id="sR">Right side</button></div>
+  <div id="pal" style="display:contents"></div>
+  <div class="hint">Pick a side, then click a tile to add it there. Drag tiles to move them. Click a tile (or drag a box around several) to select, then press Delete.</div>
+</div>
+<div id="board" class="panel"><div id="sign">=</div><div class="half on" id="hL"></div><div class="half" id="hR"></div></div>
+<div id="bar">
+  <button id="del" disabled>Delete selected (0)</button>
+  <button id="clr">Clear board</button>
+  <span id="mine"></span>
+</div>
+
+<script>
+// Equations as [x², x, 1] coefficients for the left and right side.
+const EQS=[
+ {L:[0,2,0],R:[0,0,4]},{L:[0,-1,8],R:[0,0,5]},{L:[0,2,3],R:[0,0,5]},{L:[-1,0,1],R:[0,0,8]},
+ {L:[1,0,1],R:[0,0,10]},{L:[0,1,3],R:[0,0,7]},{L:[0,2,-1],R:[0,0,5]},
+ {L:[1,2,0],R:[0,0,8]},{L:[0,2,1],R:[0,1,5]},{L:[1,0,-4],R:[0,0,5]},
+ {L:[1,1,0],R:[0,1,4]},{L:[0,3,0],R:[1,0,-2]},{L:[2,0,3],R:[1,0,7]},
+ {L:[1,-2,1],R:[0,0,4]},{L:[-1,0,6],R:[0,0,2]},{L:[1,0,0],R:[0,2,3]}
+];
+// false: tiles must show the same equation after adding/removing the same tiles on both sides.
+// true: also accept the whole equation multiplied/divided by a number (2x² + 2 = 20).
+const ALLOW_SCALE=false;
+
+const GAP=46, PAD=3;                       // half-width of the "=" zone, min gap between tiles
+const IDX={x2:0,x:1,c:2}, BASE={x2:'x²',x:'x',c:'1'};
+const SZ={x2:[72,72,22],x:[72,26,15],c:[28,28,13]};
+const $=id=>document.getElementById(id);
+const board=$('board'), sign=$('sign');
+let tiles=[], sel=new Set(), G=EQS[0], cur=0, active='L';
+
+const label=(k,s)=>(s<0?'−':'')+BASE[k];
+function fmt(p){
+  let out='';
+  [['x²',p[0]],['x',p[1]],['',p[2]]].forEach(([v,c])=>{
+    if(!c)return;
+    const a=Math.abs(c), body=v?(a===1?v:a+v):String(a);
+    out+=out?(c<0?' − ':' + ')+body:(c<0?'−':'')+body;
+  });
+  return out||'0';
+}
+function mk(k,s){
+  const [w,h,f]=SZ[k], el=document.createElement('div');
+  el.className='tile '+(s>0?'pos':'neg');
+  el.style.cssText=`width:${w}px;height:${h}px;font-size:${f}px`;
+  el.textContent=label(k,s);
+  return el;
+}
+
+/* ---------- geometry ---------- */
+const dims=()=>({W:board.clientWidth,H:board.clientHeight,mid:board.clientWidth/2});
+const sideOf=cx=>cx<dims().mid?'L':'R';
+function clampIn(t,x,y,side){
+  const d=dims(), x0=side==='L'?0:d.mid+GAP, x1=side==='L'?d.mid-GAP:d.W;
+  return [Math.max(x0,Math.min(x,x1-t.w)),Math.max(0,Math.min(y,d.H-t.h))];
+}
+const hit=(x,y,w,h,o)=>x<o.x+o.w+PAD&&x+w+PAD>o.x&&y<o.y+o.h+PAD&&y+h+PAD>o.y;
+const blocked=(t,x,y)=>tiles.some(o=>o!==t&&hit(x,y,t.w,t.h,o));
+function findSpot(t,x,y,side){            // nearest free position inside a side
+  let [cx,cy]=clampIn(t,x,y,side);
+  if(!blocked(t,cx,cy))return [cx,cy];
+  for(let r=4;r<1000;r+=4){
+    const n=Math.max(8,Math.round(r/3));
+    for(let i=0;i<n;i++){
+      const a=2*Math.PI*i/n, p=clampIn(t,x+r*Math.cos(a),y+r*Math.sin(a),side);
+      if(!blocked(t,p[0],p[1]))return p;
+    }
+  }
+  return null;
+}
+function sweep(t,tx,ty){                   // move toward target, sliding along obstacles
+  const d=dims();
+  tx=Math.max(0,Math.min(tx,d.W-t.w)); ty=Math.max(0,Math.min(ty,d.H-t.h));
+  const dx=tx-t.x, dy=ty-t.y, n=Math.ceil(Math.max(Math.abs(dx),Math.abs(dy))/4);
+  for(let i=0;i<n;i++){
+    if(!blocked(t,t.x+dx/n,t.y))t.x+=dx/n;
+    if(!blocked(t,t.x,t.y+dy/n))t.y+=dy/n;
+  }
+}
+const place=t=>{t.el.style.left=t.x+'px';t.el.style.top=t.y+'px'};
+
+/* ---------- state ---------- */
+function update(){
+  const L=[0,0,0],R=[0,0,0];
+  tiles.forEach(t=>(t.side==='L'?L:R)[IDX[t.k]]+=t.s);
+  const d=L.map((v,i)=>v-R[i]), g=G.L.map((v,i)=>v-G.R[i]);
+  const nz=a=>a.some(v=>v);
+  let ok=nz(d)&&d.every((v,i)=>v===g[i]);
+  if(!ok&&ALLOW_SCALE&&nz(d)){
+    const i=g.findIndex(v=>v); // d = k·g, k ≠ 0
+    ok=g.every((v,j)=>d[j]*g[i]===d[i]*v)&&d[i]!==0;
+  }
+  sign.classList.toggle('ok',ok);
+  $('mine').textContent='Your tiles: '+fmt(L)+' = '+fmt(R);
+}
+function refreshSel(){
+  tiles.forEach(t=>t.el.classList.toggle('sel',sel.has(t)));
+  $('del').textContent=`Delete selected (${sel.size})`; $('del').disabled=!sel.size;
+}
+function removeTiles(pred){
+  tiles=tiles.filter(t=>{if(pred(t)){t.el.remove();return false}return true});
+  sel=new Set([...sel].filter(t=>tiles.includes(t)));
+  refreshSel(); update();
+}
+const deleteSel=()=>removeTiles(t=>sel.has(t));
+function autoSpot(t,side){                // first free spot, scanning rows from the top-left of a side
+  const d=dims(), x0=side==='L'?0:d.mid+GAP, x1=side==='L'?d.mid-GAP:d.W;
+  for(let y=8;y<=d.H-t.h-8;y+=6)for(let x=x0+8;x<=x1-t.w-8;x+=6)if(!blocked(t,x,y))return [x,y];
+  return null;
+}
+function setSide(side){
+  active=side;
+  $('hL').classList.toggle('on',side==='L'); $('hR').classList.toggle('on',side==='R');
+  $('sL').classList.toggle('on',side==='L'); $('sR').classList.toggle('on',side==='R');
+}
+function addTile(k,s,side){
+  const [w,h]=SZ[k], t={k,s,w,h,side,el:mk(k,s)};
+  const p=autoSpot(t,side);
+  if(!p){const e=$(side==='L'?'hL':'hR'); e.classList.add('full'); setTimeout(()=>e.classList.remove('full'),400); return;}
+  [t.x,t.y]=p; place(t);
+  t.el.addEventListener('pointerdown',e=>startDrag(e,t));
+  board.appendChild(t.el); tiles.push(t);
+}
+
+/* ---------- dragging tiles already on the board ---------- */
+function startDrag(e,t){
+  e.preventDefault();
+  t.el.setPointerCapture(e.pointerId);
+  const sx=e.clientX, sy=e.clientY, ox=t.x, oy=t.y; let moved=false;
+  const mv=ev=>{
+    const dx=ev.clientX-sx, dy=ev.clientY-sy;
+    if(!moved){if(Math.hypot(dx,dy)<4)return; moved=true; t.el.classList.add('drag');}
+    sweep(t,ox+dx,oy+dy); place(t);
+  };
+  const up=()=>{
+    t.el.removeEventListener('pointermove',mv);
+    t.el.removeEventListener('pointerup',up);
+    t.el.removeEventListener('pointercancel',up);
+    t.el.classList.remove('drag');
+    if(!moved){sel.has(t)?sel.delete(t):sel.add(t); refreshSel(); return;}
+    const p=findSpot(t,t.x,t.y,sideOf(t.x+t.w/2));
+    if(p)[t.x,t.y]=p; else [t.x,t.y]=[ox,oy];
+    t.side=sideOf(t.x+t.w/2); place(t); update();
+  };
+  t.el.addEventListener('pointermove',mv);
+  t.el.addEventListener('pointerup',up);
+  t.el.addEventListener('pointercancel',up);
+}
+
+/* ---------- palette: click adds a tile to the chosen side ---------- */
+[['x2',1],['x2',-1],['x',1],['x',-1],['c',1],['c',-1]].forEach(([k,s])=>{
+  const el=mk(k,s); el.classList.add('pal'); el.tabIndex=0; el.setAttribute('role','button');
+  const add=()=>{addTile(k,s,active); update()};
+  el.addEventListener('click',add);
+  el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();add()}});
+  $('pal').appendChild(el);
+});
+$('sL').onclick=()=>setSide('L'); $('sR').onclick=()=>setSide('R');
+setSide('L');
+
+/* ---------- box selection on empty board ---------- */
+board.addEventListener('pointerdown',e=>{
+  if(e.target!==board)return;
+  board.setPointerCapture(e.pointerId);
+  const r=board.getBoundingClientRect(), x0=e.clientX-r.left, y0=e.clientY-r.top;
+  const base=e.shiftKey?new Set(sel):new Set(), box=document.createElement('div');
+  box.className='marq'; board.appendChild(box); let moved=false;
+  const mv=ev=>{
+    const x1=ev.clientX-r.left, y1=ev.clientY-r.top;
+    const x=Math.min(x0,x1), y=Math.min(y0,y1), w=Math.abs(x1-x0), h=Math.abs(y1-y0);
+    if(w+h>4)moved=true;
+    Object.assign(box.style,{left:x+'px',top:y+'px',width:w+'px',height:h+'px'});
+    sel=new Set(base); tiles.forEach(t=>{if(t.x<x+w&&t.x+t.w>x&&t.y<y+h&&t.y+t.h>y)sel.add(t)});
+    refreshSel();
+  };
+  const up=()=>{
+    board.removeEventListener('pointermove',mv);
+    board.removeEventListener('pointerup',up);
+    board.removeEventListener('pointercancel',up);
+    box.remove();
+    if(!moved&&!e.shiftKey){sel.clear(); refreshSel(); setSide(sideOf(x0));}
+  };
+  board.addEventListener('pointermove',mv);
+  board.addEventListener('pointerup',up);
+  board.addEventListener('pointercancel',up);
+});
+
+/* ---------- controls ---------- */
+function load(i){
+  cur=i; G=EQS[i]; $('eq').textContent=fmt(G.L)+' = '+fmt(G.R);
+  removeTiles(()=>true);
+}
+$('next').onclick=()=>load((cur+1)%EQS.length);
+$('del').onclick=deleteSel;
+$('clr').onclick=()=>removeTiles(()=>true);
+addEventListener('keydown',e=>{if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();deleteSel()}});
+addEventListener('resize',()=>{
+  const all=tiles; tiles=[];
+  all.forEach(t=>{const p=findSpot(t,t.x,t.y,t.side); if(p)[t.x,t.y]=p; tiles.push(t); place(t)});
+  update();
+});
+load(0);
+</script>
+</body>
+</html>

@@ -1,477 +1,454 @@
-/* ==================================== */
-/* 1. Global, Variables & Body          */
-/* ==================================== */
+/* ==== 1. Variables and base ==== */
+:root {
+    color-scheme: light dark;
 
-/* CSS Reset and Box Sizing */
+    --bg: #f5ecd7;        /* beige */
+    --surface: #fffaf0;   /* cream */
+    --tint: #efe3c8;
+    --ink: #3b2f25;
+    --muted: #6b5b4b;
+    --line: #dccfb0;
+    --accent: #2f6f62;
+
+    /* Muted subject colours, used only as a card stripe */
+    --c-math: #3f7cac;
+    --c-english: #5a9a62;
+    --c-science: #d98a2b;
+    --c-history: #8a6a4f;
+    --c-other: #a45c8a;
+
+    --font-body: ui-rounded, "Trebuchet MS", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+
+    --max: 1080px;
+    --pad: 1.25rem;
+    --gap: 1.25rem;
+    --radius: 16px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #221c16;        /* warm dark brown */
+        --surface: #2d251d;
+        --tint: #3a3025;
+        --ink: #f1e8d6;
+        --muted: #c2b59f;
+        --line: #4a3f31;
+        --accent: #8fcfbd;
+
+        --c-math: #6aa8d6;
+        --c-english: #82c08a;
+        --c-science: #eeaa55;
+        --c-history: #b8956f;
+        --c-other: #cf88b4;
+    }
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-/* CSS Variables for consistent spacing */
-:root {
-    --content-padding: 15px; /* Padding for mobile */
-    --card-gap: 15px;        /* Gap for grids */
-}
+html { font-size: 112.5%; } /* 18px base for young readers */
 
-/* Base body styles */
 body {
-    font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-    background-color: #f7fcf9;
-    color: #333;
-    line-height: 1.6;
-    font-size: 1rem; /* Base font size (typically 16px) */
-    overflow-x: hidden; /* Prevents accidental horizontal scroll */
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.7;
+    text-align: center;
+    overflow-x: hidden;
 }
 
-/* Main content wrapper for centering and constraining width */
-main {
-    max-width: 1080px;
-    margin: 0 auto;
-    padding: 20px var(--content-padding);
+a { color: var(--accent); text-underline-offset: 0.18em; }
+
+:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
 }
 
-/* Utility for clearing floats */
-.clearfix::after {
-    content: "";
-    clear: both;
-    display: table;
+.clearfix::after { content: ""; clear: both; display: table; }
+
+main,
+.hero-placeholder,
+.button-grid-section,
+.lesson-grid-section {
+    max-width: var(--max);
+    margin-inline: auto;
+    padding-inline: var(--pad);
 }
 
-/* ==================================== */
-/* 2. Typography                        */
-/* ==================================== */
+main { padding-block: 1.25rem; }
 
-h1 {
-    color: #333;
-    font-size: 2rem; /* 32px */
-    margin-bottom: 15px;
+/* ==== 2. Typography ==== */
+h1, h2, h3 {
+    font-family: var(--font-body);
+    font-weight: 800;
+    line-height: 1.25;
+    color: var(--ink);
 }
 
-h2 {
-    color: #007bff;
-    font-size: 1.6rem; /* ~26px */
-    border-bottom: 2px solid #007bff;
-    padding-bottom: 8px;
-    margin-top: 30px;
-    margin-bottom: 20px;
-}
+h1 { font-size: 2.1rem; margin-bottom: 1rem; }
+h2 { font-size: 1.6rem; margin: 2rem 0 0.75rem; }
+h3 { font-size: 1.25rem; margin: 1.5rem 0 0.5rem; }
 
-h3 {
-    color: #333;
-    font-size: 1.25rem; /* 20px */
-    margin-top: 25px;
-    margin-bottom: 10px;
-}
+p { margin-bottom: 1rem; }
 
-p, li {
-    font-size: 1rem; /* 16px */
-    margin-bottom: 15px;
-}
+/* Lists stay readable when centred */
+ul, ol { list-style-position: inside; }
+li { margin-bottom: 0.4rem; }
 
-strong {
-    font-weight: bold;
-}
-
-/* ==================================== */
-/* 3. Layout Components (Header/Footer) */
-/* ==================================== */
-
+/* ==== 3. Header and footer ==== */
 .navbar {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    background-color: #4CAF50;
-    padding: 10px var(--content-padding);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    padding: 0.9rem var(--pad);
+    background: var(--surface);
+    border-bottom: 2px solid var(--line);
 }
 
 .nav-brand a {
-    font-size: 1.4em;
+    font-size: 1.6rem;
     font-weight: 800;
-    color: #FFD700;
+    color: var(--accent);
     text-decoration: none;
-}
-
-.nav-item {
-    color: white;
-    text-decoration: none;
-    padding: 10px 15px;
-    display: block;
-    transition: background-color 0.3s;
-}
-
-.nav-item:hover {
-    background-color: #388E3C;
-}
-
-.nav-left, .nav-right {
-    display: none;
-    flex-direction: column;
-    width: 100%;
-}
-
-.nav-left.active, .nav-right.active {
-    display: flex;
-}
-
-.account-btn {
-    background-color: #FF6347;
-    border-radius: 5px;
-    margin: 5px 0;
-    text-align: center;
 }
 
 .menu-toggle {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.8em;
+    margin-top: 0.5rem;
+    padding: 0.35rem 0.9rem;
+    font-size: 1.3rem;
+    line-height: 1;
+    color: var(--ink);
+    background: var(--bg);
+    border: 2px solid var(--line);
+    border-radius: 10px;
     cursor: pointer;
+}
+
+.nav-left,
+.nav-right {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.nav-left.active,
+.nav-right.active { display: flex; }
+
+.nav-item {
     display: block;
+    padding: 0.5rem 0.9rem;
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.nav-item:hover {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
+}
+
+.account-btn {
+    margin: 0.4rem 0;
+    padding: 0.4rem 1.1rem;
+    color: var(--accent);
+    border: 2px solid var(--accent);
+    border-radius: 999px;
+}
+
+.account-btn:hover {
+    background: var(--accent);
+    color: var(--surface);
+    text-decoration: none;
 }
 
 .main-footer {
-    text-align: center;
-    padding: 20px var(--content-padding);
-    background-color: #333;
-    color: #ccc;
-    font-size: 0.9em;
-    margin-top: 30px;
+    margin-top: 3rem;
+    padding: 1.5rem var(--pad);
+    background: var(--tint);
+    border-top: 2px solid var(--line);
+    color: var(--muted);
+    font-size: 0.9rem;
 }
+
+.main-footer p { margin: 0.5rem 0 0; }
 
 .footer-links a {
-    color: #ccc;
+    margin: 0 0.5rem;
+    color: var(--muted);
     text-decoration: none;
-    margin: 0 8px;
 }
 
-/* ==================================== */
-/* 4. Page Sections (Hero, Grids)       */
-/* ==================================== */
+.footer-links a:hover { color: var(--accent); text-decoration: underline; }
 
+/* ==== 4. Hero and card grids ==== */
 .hero-placeholder {
-    background: linear-gradient(135deg, #FFC0CB, #ADD8E6);
-    padding: 40px var(--content-padding);
-    text-align: center;
-    border-radius: 8px;
-    margin-bottom: 20px;
+    margin-top: 1.25rem;
+    padding: 2.25rem var(--pad);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: var(--radius);
 }
 
-.hero-content h1, .hero-content h2 {
-    color: #8B008B;
-    border-bottom: none;
+.hero-placeholder img { border-radius: 12px; }
+
+.hero-content h1,
+.hero-content h2 {
+    margin: 0 0 0.75rem;
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
 }
 
 .hero-content p {
-    color: #4B0082;
-    font-size: 1.1em;
+    max-width: 55ch;
+    margin-inline: auto;
+    color: var(--muted);
 }
 
-.button-grid-section, .lesson-grid-section {
+.back-link {
+    display: inline-block;
+    margin-top: 0.25rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.back-link:hover { text-decoration: underline; }
+
+.button-grid-section,
+.lesson-grid-section {
     display: flex;
-    flex-direction: column; /* Mobile: Stack vertically */
-    gap: var(--card-gap);
-    padding-top: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--gap);
+    padding-block: 1.75rem 1rem;
 }
 
-/* ==================================== */
-/* 5. Lesson Page Content Blocks        */
-/* ==================================== */
+/* ==== 5. Cards (work on <button> and <a>) ==== */
+.action-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.4rem;
+    flex: 0 1 260px;
+    min-height: 11rem;
+    padding: 1.25rem 1.1rem 1.1rem;
+    font: inherit;
+    text-align: center;
+    text-decoration: none;
+    color: var(--ink);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-top: 8px solid var(--c-other);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s;
+}
 
+.action-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+}
+
+.card-icon {
+    display: block;
+    font-size: 2rem;
+    line-height: 1.2;
+}
+
+.card-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+.action-card[data-hover]::after {
+    content: attr(data-hover);
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.45;
+}
+
+/* Subject stripes */
+.math-category, .explore-button, .madhyamik-maths   { border-top-color: var(--c-math); }
+.english-category, .translate-button                { border-top-color: var(--c-english); }
+.science-category, .madhyamik-science, .games-button { border-top-color: var(--c-science); }
+.history-category, .madhyamik-history, .madhyamik-geo { border-top-color: var(--c-history); }
+.mock-test-button, .mock-test-entrance, .lucky-button,
+.psychology-category, .pedagogy-category, .misc-category { border-top-color: var(--c-other); }
+
+/* ==== 6. Lesson content blocks ==== */
 .info-box {
-    background-color: #e6f7ff;
-    padding: 25px;
-    border-radius: 5px;
-    margin-bottom: 20px;
+    margin-bottom: 1.25rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--tint);
+    border-radius: var(--radius);
 }
 
 .activity {
-    background-color: #fff;
-    padding: 20px;
-    border: 1px dashed #ff9900;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    overflow: hidden; /* Use hidden instead of auto to contain floats */
+    margin-bottom: 1.25rem;
+    padding: 1.25rem;
+    background: var(--surface);
+    border: 2px dashed var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
 }
 
-/* Standardize lists within content blocks */
-.info-box ul, .info-box ol,
-.activity ul, .activity ol {
-    padding-left: 25px;
-    margin-left: 0;
-}
-
-/* ==================================== */
-/* 6. Lesson Page Specific Elements     */
-/* ==================================== */
-
-/* Images */
 .inline-figure {
     display: block;
     width: 100%;
-    margin: 15px 0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 5px;
-    background-color: #f9f9f9;
+    max-width: 320px;
+    margin: 1rem auto;
+    padding: 6px;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 12px;
 }
+
 .inline-figure img {
+    display: block;
     width: 100%;
     height: auto;
-    display: block;
-    border-radius: 3px;
-}
-.inline-figure p {
-    color: #555;
-    font-size: 0.9em;
-    text-align: center;
-    margin: 5px 0 0;
+    border-radius: 8px;
 }
 
-/* Math & Tables */
-.table-responsive {
-    overflow-x: auto;
-    margin: 15px 0;
+.inline-figure p {
+    margin: 0.4rem 0 0;
+    color: var(--muted);
+    font-size: 0.9rem;
 }
+
+.table-responsive { overflow-x: auto; margin: 1rem 0; }
+
 table {
-    border-collapse: collapse;
     width: 100%;
     min-width: 300px;
-    border: 1px solid #c2f0c2;
-    font-size: 1rem;
+    margin-inline: auto;
+    border-collapse: collapse;
 }
+
 th, td {
-    border: 1px solid #c2f0c2;
-    padding: 10px;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--line);
     text-align: center;
 }
-th {
-    background-color: #e8f5e9;
-}
 
-/* --- START: NEW/UPDATED MATH STYLES --- */
+th { background: var(--tint); }
 
-/* The base for all informational boxes */
+/* ==== 7. Mathematics elements ==== */
 .math-box {
-    background-color: #eef5ff; /* A calm, light blue */
-    border-left: 4px solid #007bff; /* An accent border */
-    padding: 10px;
-    margin: 15px 0;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 1em;
-    color: #334155; /* A softer dark blue-gray for text */
-    border-radius: 0 8px 8px 0; /* Rounded corners on one side */
-    overflow-x: auto; /* Ensures long content wraps nicely */
+    margin: 1rem 0;
+    padding: 0.75rem 1rem;
+    background: var(--tint);
+    border-radius: 12px;
+    font-family: var(--font-mono);
+    overflow-x: auto;
 }
 
-/* A dedicated style for pre-formatted math/code blocks */
 .math-code-block {
-    background-color: #f8f9fa; /* A very light gray */
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 16px;
-    margin: 20px 0;
-    overflow-x: auto; /* This is crucial for responsiveness */
+    margin: 1.25rem 0;
+    padding: 1rem;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    overflow-x: auto;
 }
 
 .math-code-block pre {
-    margin: 0;
-    padding: 0;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 1.1em;
-    color: #333;
-    white-space: pre; /* Preserves formatting */
-    background-color: transparent; /* Inherits from parent */
+    font-family: var(--font-mono);
+    font-size: 1.05em;
+    white-space: pre;
+    background: transparent;
 }
 
-/* A flexible grid for laying out content */
-.content-grid, .math-example-grid {
-    display: grid;
-    grid-template-columns: 1fr; /* 1 column on mobile (default) */
-    gap: 20px;
-    margin: 20px 0;
-}
-
-/* Style items inside the grid */
-.math-example-grid .math-box {
-    margin: 0; /* The grid's "gap" property handles spacing */
-    width: 100%;
-    text-align: center;
+.math-equation {
+    margin: 1.25rem 0;
+    padding: 1.25rem;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    font-size: 1.3em;
+    overflow-x: auto;
 }
 
 .fill-in-line {
     display: inline-block;
     min-width: 40px;
-    border-bottom: 1px solid #333;
     margin: 0 5px;
     padding: 0 2px;
+    border-bottom: 2px solid var(--ink);
 }
 
-.math-equation {
-    text-align: center;
-    padding: 20px;
-    margin: 20px 0;
-    font-size: 1.2em;
-    overflow-x: auto;
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 5px;
-}
-
-/* Other Math Grids */
-.math-exercise-grid, .math-equivalents-grid, .shopping-list-grid {
+.content-grid,
+.math-example-grid {
     display: grid;
-    gap: 10px;
-    margin: 15px 0;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin: 1.25rem 0;
 }
-.math-exercise-grid {
-    grid-template-columns: 1fr; /* 1 column on mobile */
-}
-.math-equivalents-grid {
-    grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */
-    text-align: center;
-}
+
+.math-example-grid .math-box { width: 100%; margin: 0; }
+
+.math-exercise-grid,
+.math-equivalents-grid,
 .shopping-list-grid {
-    grid-template-columns: 1fr auto; /* 2 columns for item/price */
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 10px;
+    display: grid;
+    gap: 0.75rem;
+    margin: 1rem 0;
 }
+
+.math-exercise-grid    { grid-template-columns: 1fr; }
+.math-equivalents-grid { grid-template-columns: repeat(2, 1fr); }
+
+.shopping-list-grid {
+    grid-template-columns: 1fr auto;
+    margin-inline: auto;
+    padding: 0.75rem;
+    border: 2px solid var(--line);
+    border-radius: 12px;
+}
+
 .shopping-list-grid > span {
-    padding: 5px 0;
-    border-bottom: 1px dashed #eee;
-}
-.shopping-list-grid > span:nth-child(odd) {
-    font-weight: bold;
-}
-.shopping-list-grid > span:nth-child(even) {
-    text-align: right;
-    font-weight: bold;
-    color: #FF6347;
+    padding: 0.3rem 0;
+    border-bottom: 1px dashed var(--line);
+    font-weight: 700;
 }
 
-/* --- END: NEW/UPDATED MATH STYLES --- */
+.shopping-list-grid > span:nth-child(even) { text-align: right; color: var(--accent); }
 
-/* ==================================== */
-/* 7. Card & Button Styles              */
-/* ==================================== */
-
-.action-card {
-    background-color: #FF6347;
-    color: white;
-    border: none;
-    border-radius: 15px;
-    padding: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: center;
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
-    width: 100%;
-}
-
-.action-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
-}
-
-.card-icon {
-    font-size: 3em;
-    display: block;
-    margin-bottom: 10px;
-}
-
-.card-title {
-    font-size: 1.3em;
-    font-weight: bold;
-}
-
-/* Card Category Colors */
-.explore-button, .math-category { background-color: #00BFFF; }
-.translate-button, .english-category { background-color: #3CB371; }
-.games-button { background-color: #FFD700; color: #333; }
-.lucky-button { background-color: #9370DB; }
-.mock-test-button, .mock-test-entrance { background-color: #FFA500; }
-.science-category { background-color: #FF9800; }
-.history-category { background-color: #795548; }
-.psychology-category { background-color: #9C27B0; }
-.pedagogy-category { background-color: #4CAF50; }
-.misc-category { background-color: #FFEB3B; color: #333; }
-.mock-test-school { background-color: #388E3C; }
-.mock-test-nursing, .madhyamik-lang { background-color: #00BCD4; }
-.madhyamik-science { background-color: #4CAF50; }
-.madhyamik-maths { background-color: #2196F3; }
-.madhyamik-history, .madhyamik-geo { background-color: #FF9800; }
-.madhyamik-optional { background-color: #9C27B0; }
-
-/* ==================================== */
-/* 8. Media Queries (Tablet & Desktop)  */
-/* ==================================== */
-
-/* Tablet and larger */
+/* ==== 8. Larger screens ==== */
 @media (min-width: 768px) {
-    :root {
-        --content-padding: 25px; /* Increase padding for larger screens */
-    }
+    :root { --pad: 1.75rem; }
 
-    /* --- Navigation --- */
     .menu-toggle { display: none; }
-    .nav-left, .nav-right {
-        display: flex !important;
-        flex-direction: row;
-        width: auto;
-    }
 
-    /* --- Grids --- */
-    .button-grid-section, .lesson-grid-section {
+    .nav-left,
+    .nav-right {
+        display: flex;
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
-    }
-    .button-grid-section .action-card {
-        width: calc(50% - var(--card-gap)); /* 2 cards per row */
-        max-width: 300px;
-    }
-    .lesson-grid-section .action-card {
-        width: calc(33.333% - var(--card-gap)); /* 3 cards per row */
-        max-width: 300px;
+        width: auto;
     }
 
-    /* --- Lesson Content --- */
-    .inline-figure {
-        float: right;
-        width: 35%;
-        max-width: 300px;
-        margin: 5px 0 15px 20px;
-    }
-    .math-exercise-grid {
-        grid-template-columns: repeat(2, 1fr); /* 2 columns */
-    }
-    .math-equivalents-grid {
-        grid-template-columns: repeat(4, 1fr); /* 4 columns */
-    }
-    .shopping-list-grid {
-        max-width: 450px;
-    }
-    
-    .content-grid, .math-example-grid {
-        grid-template-columns: repeat(2, 1fr); /* 2 columns on tablet/desktop */
-    }
+    .nav-left { margin-top: 0.4rem; }
+    .nav-right { margin-top: 0.2rem; }
+
+    .math-exercise-grid    { grid-template-columns: repeat(2, 1fr); }
+    .math-equivalents-grid { grid-template-columns: repeat(4, 1fr); }
+    .shopping-list-grid    { max-width: 450px; }
+    .content-grid,
+    .math-example-grid     { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* Desktop and larger */
 @media (min-width: 1024px) {
-    body {
-        font-size: 17px; /* Slightly increase base font size on large screens */
-    }
+    .math-exercise-grid { grid-template-columns: repeat(3, 1fr); }
+}
 
-    .lesson-grid-section .action-card {
-        width: calc(25% - var(--card-gap)); /* 4 cards per row */
-    }
-
-    .math-exercise-grid {
-        grid-template-columns: repeat(3, 1fr); /* 3 columns */
-    }
+@media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
 }

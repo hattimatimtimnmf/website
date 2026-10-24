@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="GitLab Pages">
+    <title>Hattimatimtim - Algebra</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="header-placeholder"></div>
+
+    <section class="hero-placeholder" id="algebra-header">
+        <div class="hero-content">
+            <h2>Algebra Resources 𝑥</h2>
+            <p>Explore, visualise and practise algebra with these interactive resources.</p>
+            <a href="math.html" class="back-link">← Back to Mathematics Hub</a>
+        </div>
+    </section>
+
+    <section class="lesson-grid-section">
+
+        <button class="action-card math-category"
+            data-hover="Explore numbers, addition and subtraction on an interactive number line."
+            onclick="window.location.href='maths_algebra_numberline.html'">
+            <span class="card-icon">➡️</span>
+            <span class="card-title">Number Line Explorer</span>
+        </button>
+
+         <button class="action-card math-category"
+            data-hover="Practise multiplying algebraic expressions (GeoGebra)."
+            onclick="window.open('https://www.geogebra.org/mathpractice/en?input=%5Cleft(%7B2x%2B3y%7D%5Cright)%5Ccdot%20%5Cleft(%7B4x%2B2%7D%5Cright)', '_blank', 'noopener')">
+            <span class="card-icon">✖️</span>
+            <span class="card-title">Multiplication Practice</span>
+        </button>
+
+         <button class="action-card math-category"
+            data-hover="Visualise how an equation works with simple examples (GeoGebra)."
+            onclick="window.open('https://www.geogebra.org/m/fjekqnuh', '_blank', 'noopener')">
+            <span class="card-icon">📈</span>
+            <span class="card-title">Equation Visualisation</span>
+        </button>
+
+
+        <button class="action-card math-category"
+            data-hover="Understand and solve equations by balancing tiles on both sides."
+            onclick="window.location.href='maths_algebra_tile_equation.html'">
+            <span class="card-icon">🧩</span>
+            <span class="card-title">Tile Equation</span>
+        </button>
+
+        <button class="action-card math-category"
+            data-hover="Practise solving equations step by step (GeoGebra)."
+            onclick="window.open('https://www.geogebra.org/m/egbjn6ye', '_blank', 'noopener')">
+            <span class="card-icon">⚖️</span>
+            <span class="card-title">Solve Equation</span>
+        </button>
+
+       
+    </section>
+
+    <div id="footer-placeholder"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinks = document.getElementById('nav-links');
+            const navRight = document.querySelector('.nav-right');
+
+            if (menuToggle && navLinks && navRight) {
+                menuToggle.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                    navRight.classList.toggle('active');
+                });
+            }
+        });
+    </script>
+    <script src="components.js"></script>
+</body>
+</html>
